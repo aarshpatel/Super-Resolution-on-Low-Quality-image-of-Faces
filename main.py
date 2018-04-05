@@ -32,7 +32,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 		criterion = nn.MSELoss()
 
 
-	optimizer = optim.Adam(model.parameters(),lr=lr)
+	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=.001)
 
 	training_psnr = []
 	validation_psnr = []
