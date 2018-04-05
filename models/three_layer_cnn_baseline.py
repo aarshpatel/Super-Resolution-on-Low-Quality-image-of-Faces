@@ -25,7 +25,7 @@ class ThreeLayerCNNBasline(nn.Module):
         N = 1
         D_in = 5 
         D_mid = 5
-        D_out = 3
+        D_out = 1
 
         self.model = nn.Sequential(
             nn.Conv2d(N, D_in, kernel_size=(5,5), stride=(1,1), padding=(2,2)),
