@@ -61,8 +61,8 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			# compute the loss function
 
 			model_out = model_out * 255
-			target = target.float() * 256
-			
+			target = target.float() * 255
+
 			loss = criterion(model_out, target.float())
 			# store the iteration loss after every 500 iterations
 			if iterations % 500 == 0:
@@ -70,7 +70,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			# aggregate the epoch loss
 			epoch_loss += loss.data[0]
 			# calculate the batch psnr
-			psnr = 20 * log10(1/np.sqrt(loss.data[0]))
+			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
 			total_epoch_psnr += psnr
 			# backprop
 			loss.backward()
@@ -119,8 +119,11 @@ def test_psnr(model, data_loader):
 
 		prediction = model(input.float())
 
+		prediction =  prediction * 255
+		target = target.float() * 255
+
 		mse = loss(prediction, target.float())
-		psnr = 20 * log10(1/np.sqrt(mse.data[0]))
+		psnr = 20 * log10(255/np.sqrt(mse.data[0]))
 		avg_psnr += psnr
 
 	return avg_psnr / float(len(data_loader))
