@@ -26,7 +26,9 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, m
 	"""
 
 	if loss == "pixel":
-		criterion = pixel_loss
+		# criterion = pixel_loss
+		criterion = nn.MSELoss()
+
 
 	optimizer = optim.Adam(model.parameters(),lr=lr)
 
@@ -62,7 +64,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, m
 			model_out = model(input.float())
 
 			# compute the loss function
-			loss = criterion(model_out, target.float(), input_size*input_size)
+			loss = criterion(model_out, target.float())
 
 			# store the iteration loss after every 500 iterations
 			if iterations % 1 == 0:
@@ -163,7 +165,7 @@ if __name__ == "__main__":
     loss = opt.loss
     num_workers = opt.threads
 
-    main_hyperparameters = "{0}_{1}_{2}_{3}_{4}_{5}_{6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
+    main_hyperparameters = "{0}_{1}_{2}_{3}_{4}_{5}_{6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_sizel)
 
     print("Hyperparameters: ", main_hyperparameters)
 
