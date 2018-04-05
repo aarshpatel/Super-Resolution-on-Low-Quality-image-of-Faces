@@ -24,7 +24,7 @@ class ThreeLayerCNNBasline(nn.Module):
         self.conv3 = nn.Conv2d(32,1,kernel_size=5);
 
         # add bilinear upsampling
-        self.upsample = nn.UpsamplingBilinear2d(size=(110, 100))
+        self.upsample = nn.UpsamplingBilinear2d(size=(110, 110))
         # self.upsample = nn.modules.Upsample(size=(110, 110), mode="bilinear", align_corners=True)
 
     def forward(self,x):
