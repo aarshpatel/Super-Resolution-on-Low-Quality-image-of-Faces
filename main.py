@@ -64,7 +64,7 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			loss = criterion(model_out, target.float())
 
 			# store the iteration loss after every 500 iterations
-			if iterations % 500 == 0:
+			if iterations % 1 == 0:
 				training_loss_for_iterations.append((iterations, loss.data[0]))
 
 			# aggregate the epoch loss
@@ -190,5 +190,4 @@ if __name__ == "__main__":
 
     print("AVG PSNR Score on train: ", avg_psnr_score_train)
     print("AVG PSNR Score on test: ", avg_psnr_score_test)
-
 
