@@ -14,15 +14,17 @@ from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import pixel_loss
 
 
-def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, model_hyperparameters):
+def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, lr, model_hyperparameters):
 	"""
 	Train a 'facial reconstruction' model given the arguments
 
 	model: pytorch model (ex. ThreeLayerCNNBaseline)
-	loss: type of loss function (MSE, Perceptual Loss)
+	input_size: size of the input image (eg. 110)
 	train_loader: pytorch data loader for the training data
+	val_loader: pytorch data loader for the validation data
 	num_epochs: num of epochs to train the model
 	lr: regularization of the optimizer, Adam
+	model_hyperparameters: string representing the hyperparameters used training
 	"""
 
 	if loss == "pixel":
@@ -47,9 +49,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, m
 		total_epoch_psnr = 0
 
 		for iteration, batch in enumerate(train_loader, 1):
-
 			iterations += 1
-
 			input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
 
 			# use the GPU
@@ -59,39 +59,35 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, m
 
 			# zero out the gradients
 			optimizer.zero_grad()
-
 			# compute output from cnn
 			model_out = model(input.float())
-
 			# compute the loss function
 			loss = criterion(model_out, target.float())
-
 			# store the iteration loss after every 500 iterations
-			if iterations % 1 == 0:
+			if iterations % 500 == 0:
 				training_loss_for_iterations.append((iterations, loss.data[0]))
-
 			# aggregate the epoch loss
 			epoch_loss += loss.data[0]
-
 			# calculate the batch psnr
 			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
 			total_epoch_psnr += psnr
-
 			# backprop
 			loss.backward()
-
 			# perform a gradient step
 			optimizer.step()
 
-			print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(train_loader), loss.data[0]))
+			if iterations % 500:
+				print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(train_loader), loss.data[0]))
 
 		# compute the train for each batch
 		avg_epoch_psnr = total_epoch_psnr / len(train_loader)
 		training_psnr.append(avg_epoch_psnr)
+		print("Epoch Training PSNR: ", avg_epoch_psnr)
 
 		# compute the val for each batch
 		avg_val_psnr = test_psnr(model, val_loader)
 		validation_psnr.append(avg_val_psnr)
+		print("Epoch Valiaation PSNR: ", avg_val_psnr)
 
 		# if we find a model that does better in the val psnr then save its weights
 		if avg_val_psnr > best_val_psnr:
@@ -186,7 +182,7 @@ if __name__ == "__main__":
         model = model.cuda()
 
     input_size = 110
-    trained_model = train_model(model, input_size, loss, train_loader, val_loader, num_epochs, main_hyperparameters)
+    trained_model = train_model(model, input_size, loss, train_loader, val_loader, num_epochs, lr, main_hyperparameters)
 
     # save the best model
     save_model(trained_model, main_hyperparameters, "saved_models/")
