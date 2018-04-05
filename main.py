@@ -77,7 +77,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			optimizer.step()
 
 			if iterations % 500:
-				print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(train_loader), loss.data[0]))
+				print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iterations, len(train_loader), loss.data[0]))
 
 		# compute the train for each batch
 		avg_epoch_psnr = total_epoch_psnr / len(train_loader)
