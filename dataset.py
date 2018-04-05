@@ -25,26 +25,25 @@ class ObfuscatedDatasetLoader(data.Dataset):
 			y_train = []
 
 			for fn in sorted(os.listdir(dataset_location + data_type + "/")):
-
 				image_file_path = os.path.join(dataset_location + data_type + "/" + fn)
-
 				if image_file_path.endswith(".jpg"):
-
 					img = Image.open(image_file_path)
+
 					y_train_img = np.array(img)
+					y_train_img = y_train_img.astype(float)
+					y_train_img /= 255.0
 					y_train_img = np.expand_dims(y_train_img, axis=0)
 					y_train.append(y_train_img)
 
 					# apply image obfuscation
-					if method == "pixelated":
-						img = pixelate(img, size)
-					else:
-						img = apply_gaussian_blur(img, size)
+					if method == "pixelated": img = pixelate(img, size)
+					else: img = apply_gaussian_blur(img, size)
 
 					obfuscated_img_array = np.array(img)
+					obfuscated_img_array = obfuscated_img_array.astype(float)
+					obfuscated_img_array /= 255.0
 					obfuscated_img_array = np.expand_dims(obfuscated_img_array, axis=0)
-
-				x_train.append(obfuscated_img_array)
+					x_train.append(obfuscated_img_array)
 
 			if total_num_images is not None:
 				x_train = x_train[:total_num_images]
@@ -82,7 +81,7 @@ class ObfuscatedDatasetLoader(data.Dataset):
 		# 	self.Y_train /= 255
 
 		# # QUESTION: how to get back to original image, just add the train mean back to the image and scale by 255 ????
-		
+
 		# print(self.X_train)
 		# print(self.X_train.shape)
 		# print(self.Y_train.shape)

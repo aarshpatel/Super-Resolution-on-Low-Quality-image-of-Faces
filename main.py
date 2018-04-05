@@ -13,7 +13,6 @@ from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import pixel_loss
 
-
 def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, lr, model_hyperparameters):
 	"""
 	Train a 'facial reconstruction' model given the arguments
@@ -28,9 +27,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 	"""
 
 	if loss == "pixel":
-		# criterion = pixel_loss
 		criterion = nn.MSELoss()
-
 
 	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=.001)
 
@@ -165,16 +162,16 @@ if __name__ == "__main__":
     print("Hyperparameters: ", main_hyperparameters)
 
     # get the training data
-    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=None)
+    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "train", train_mean=None, total_num_images=None)
     # train_mean = train_dset.train_mean
     train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     # get the validation set
-    val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "val")
+    val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "val")
     val_loader = DataLoader(val_dset, shuffle=True, num_workers=num_workers)
 
     # get the test set
-    test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "test")
+    test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "test")
     test_loader = DataLoader(test_dset, shuffle=True, num_workers=num_workers)
 
     model = ThreeLayerCNNBasline()
