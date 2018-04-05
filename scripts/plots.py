@@ -1,10 +1,12 @@
 """ Plotting utils """
 
-import pandas as pd 
-import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
+
 import matplotlib
 matplotlib.style.use("fivethirtyeight")
+
 
 def plot_training_loss(training_losses, output):
 	""" Plot the training loss across the iterations """
@@ -16,7 +18,7 @@ def plot_training_loss(training_losses, output):
 		"Loss": losses
 	})
 
-	ax = df.plot.line(x="Iterations", y="Loss", legend=False, style='.-' )	
+	ax = df.plot.line(x="Iterations", y="Loss", legend=False, style='.-' )
 	ax.set_xlabel("Iterations")
 	ax.set_ylabel("Loss")
 	fig = ax.get_figure()
@@ -28,7 +30,7 @@ def plot_train_val_psnr(train_psnr, val_psnr, output):
 
 	df = pd.DataFrame({
 		"Epochs": range(len(train_psnr)),
-		"Train PSNR": train_psnr, 
+		"Train PSNR": train_psnr,
 		"Val PSNR": val_psnr
 	})
 

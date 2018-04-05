@@ -14,8 +14,8 @@ from scripts.plots import plot_training_loss, plot_train_val_psnr
 
 
 def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperparameters):
-	""" 
-	Train a 'facial reconstruction' model given the arguments 
+	"""
+	Train a 'facial reconstruction' model given the arguments
 
 	model: pytorch model (ex. ThreeLayerCNNBaseline)
 	loss: type of loss function (MSE, Perceptual Loss)
@@ -55,12 +55,12 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			    target = target.cuda()
 
 			# zero out the gradients
-			optimizer.zero_grad() 
+			optimizer.zero_grad()
 
 			# compute output from cnn
 			model_out = model(input.float())
 
-			# compute the loss function 
+			# compute the loss function
 			loss = criterion(model_out, target.float())
 
 			# store the iteration loss after every 500 iterations
@@ -70,7 +70,7 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			# aggregate the epoch loss
 			epoch_loss += loss.data[0]
 
-			# calculate the psnr 
+			# calculate the psnr
 			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
 			total_epoch_psnr += psnr
 
@@ -94,7 +94,7 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			best_val_psnr = avg_val_psnr
 			best_model_weights = copy.deepcopy(model.state_dict())
 
-		print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(train_loader)))     
+		print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(train_loader)))
 
 	# plot the training loss and train/val psnr values
 	plot_training_loss(training_loss_for_iterations, "figures/{0}_training_loss.png".format(model_hyperparameters))
@@ -119,7 +119,7 @@ def test_psnr(model, data_loader):
 
 		prediction = model(input.float())
 
-		mse = loss(prediction, target.float()) 
+		mse = loss(prediction, target.float())
 		psnr = 20 * log10(255/np.sqrt(mse.data[0]))
 		avg_psnr += psnr
 
@@ -135,59 +135,60 @@ def save_model(model, model_name, location):
 	print("Model saved to {}".format(model_out_path))
 
 if __name__ == "__main__":
-	# get the arguments
-	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-	parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
-	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
-	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
-	parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
-	parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
-	parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
-	parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
-	parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
-	parser.add_argument('--cuda', action='store_true', help='use cuda?')
-	parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
-	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
-	opt = parser.parse_args()
-		
-	num_epochs = opt.epochs
-	lr = opt.lr
-	method = opt.method
-	size = opt.size
-	batch_size = opt.batch_size 
-	use_cuda = opt.cuda
-	loss = opt.loss
+    # get the arguments
+    parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
+    parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
+    parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
+    parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
+    parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
+    parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
+    parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
+    parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
+    parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
+    parser.add_argument('--cuda', action='store_true', help='use cuda?')
+    parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
+    parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
+    opt = parser.parse_args()
 
-	main_hyperparameters = "{0}_{1}_{2}_{3}_{4}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr)	
-	print("Hyperparameters: ", main_hyperparameters)
+    num_epochs = opt.epochs
+    lr = opt.lr
+    method = opt.method
+    size = opt.size
+    batch_size = opt.batch_size
+    use_cuda = opt.cuda
+    loss = opt.loss
+    num_workers = opt.threads
 
-	# get the training data 
-	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=5)
-	# train_mean = train_dset.train_mean
-	train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True)
+    main_hyperparameters = "{0}_{1}_{2}_{3}_{4}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr)
+    print("Hyperparameters: ", main_hyperparameters)
 
-	# get the validation set
-	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "val")
-	val_loader = DataLoader(val_dset, shuffle=True)
+    # get the training data
+    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=None)
+    # train_mean = train_dset.train_mean
+    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
-	# get the test set
-	test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "test")
-	test_loader = DataLoader(test_dset, shuffle=True)
+    # get the validation set
+    val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "val")
+    val_loader = DataLoader(val_dset, shuffle=True, num_workers=num_workers)
 
-	model = ThreeLayerCNNBasline()
+    # get the test set
+    test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "test")
+    test_loader = DataLoader(test_dset, shuffle=True, num_workers=num_workers)
 
-	if use_cuda:
-		model = model.cuda()
+    model = ThreeLayerCNNBasline()
 
-	trained_model = train_model(model, loss, train_loader, val_loader, num_epochs, main_hyperparameters)
+    if use_cuda:
+        model = model.cuda()
 
-	# save the best model
-	save_model(trained_model, main_hyperparameters, "save_models/")
+    trained_model = train_model(model, loss, train_loader, val_loader, num_epochs, main_hyperparameters)
 
-	# avg_psnr_score_train = test_psnr(trained_model, train_loader)
-	# avg_psnr_score_test = test_psnr(trained_model, test_loader)
+    # save the best model
+    save_model(trained_model, main_hyperparameters, "saved_models/")
 
-	# print("AVG PSNR Score on train: ", avg_psnr_score_train)
-	# print("AVG PSNR Score on test: ", avg_psnr_score_test)
+    avg_psnr_score_train = test_psnr(trained_model, train_loader)
+    avg_psnr_score_test = test_psnr(trained_model, test_loader)
+
+    print("AVG PSNR Score on train: ", avg_psnr_score_train)
+    print("AVG PSNR Score on test: ", avg_psnr_score_test)
 
 
