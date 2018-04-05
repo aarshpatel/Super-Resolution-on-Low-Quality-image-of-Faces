@@ -60,9 +60,6 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			model_out = model(input.float())
 			# compute the loss function
 
-			model_out = model_out * 255
-			target = target.float() * 255
-
 			loss = criterion(model_out, target.float())
 			# store the iteration loss after every 500 iterations
 			if iterations % 500 == 0:
@@ -118,9 +115,6 @@ def test_psnr(model, data_loader):
 			target = target.cuda()
 
 		prediction = model(input.float())
-
-		prediction =  prediction * 255
-		target = target.float() * 255
 
 		mse = loss(prediction, target.float())
 		psnr = 20 * log10(255/np.sqrt(mse.data[0]))

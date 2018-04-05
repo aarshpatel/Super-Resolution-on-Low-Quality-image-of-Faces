@@ -7,7 +7,6 @@ import torch
 import torchvision
 import torch.nn as nn
 
-
 class ThreeLayerCNNBasline(nn.Module):
     """ 
     Simple three layer baseline that uses padding to perseve the spatial size 
@@ -23,7 +22,6 @@ class ThreeLayerCNNBasline(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=16, out_channels=1, kernel_size=1, padding=0, stride=1)
         self.relu1 = nn.ReLU()
         self.upsampling = nn.modules.UpsamplingBilinear2d(size=(110, 110))
-        self.sigmoid_out = nn.Sigmoid()
 
     def forward(self,x):
         out = self.conv_block_1(x)
@@ -32,6 +30,5 @@ class ThreeLayerCNNBasline(nn.Module):
         out = self.conv1(out)
         out = self.relu1(out)
         out = self.upsampling(out)
-        out = self.sigmoid_out(out)
         return out
 
