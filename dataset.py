@@ -31,7 +31,7 @@ class ObfuscatedDatasetLoader(data.Dataset):
 
 					y_train_img = np.array(img)
 					y_train_img = y_train_img.astype(float)
-					y_train_img /= 255.0
+					# y_train_img /= 255.0
 					y_train_img = np.expand_dims(y_train_img, axis=0)
 					y_train.append(y_train_img)
 
@@ -41,7 +41,7 @@ class ObfuscatedDatasetLoader(data.Dataset):
 
 					obfuscated_img_array = np.array(img)
 					obfuscated_img_array = obfuscated_img_array.astype(float)
-					obfuscated_img_array /= 255.0
+					# obfuscated_img_array /= 255.0
 					obfuscated_img_array = np.expand_dims(obfuscated_img_array, axis=0)
 					x_train.append(obfuscated_img_array)
 

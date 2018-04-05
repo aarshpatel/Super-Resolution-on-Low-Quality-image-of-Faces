@@ -18,9 +18,9 @@ class ThreeLayerCNNBasline(nn.Module):
 
         super(ThreeLayerCNNBasline,self).__init__()
         self.conv_block_1 = ConvBlock(in_channel=1, out_channel=64, kernel_size=3, padding=0, stride=1)
-        self.conv_block_2 = ConvBlock(in_channel=64, out_channel=128, kernel_size=3, padding=0, stride=1, pool=False)
-        self.conv_block_3 = ConvBlock(in_channel=128, out_channel=256, kernel_size=3, padding=0, stride=1, pool=False)
-        self.conv1 = nn.Conv2d(in_channels=256, out_channels=1, kernel_size=1, padding=0, stride=1)
+        self.conv_block_2 = ConvBlock(in_channel=64, out_channel=32, kernel_size=3, padding=0, stride=1, pool=False)
+        self.conv_block_3 = ConvBlock(in_channel=32, out_channel=16, kernel_size=3, padding=0, stride=1, pool=False)
+        self.conv1 = nn.Conv2d(in_channels=16, out_channels=1, kernel_size=1, padding=0, stride=1)
         self.relu1 = nn.ReLU()
         self.upsampling = nn.modules.UpsamplingBilinear2d(size=(110, 110))
         self.sigmoid_out = nn.Sigmoid()
