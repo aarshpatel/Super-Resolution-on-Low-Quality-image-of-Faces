@@ -1,4 +1,4 @@
-from dataset import ObfuscatedDatasetLoader
+import torch
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 import torch.nn as nn
@@ -7,7 +7,7 @@ from math import log10
 import argparse
 import numpy as np
 import copy
-
+from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
 from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
@@ -63,9 +63,9 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			# compute the loss function 
 			loss = criterion(model_out, target.float())
 
-			# store the iteration loss
-			if iterations % 1 == 0:
-				training_loss_for_iterations.append((iteration, loss.data[0]))
+			# store the iteration loss after every 500 iterations
+			if iterations % 500 == 0:
+				training_loss_for_iterations.append((iterations, loss.data[0]))
 
 			# aggregate the epoch loss
 			epoch_loss += loss.data[0]
@@ -129,6 +129,10 @@ def test_ssim(model):
 	""" Calculate the avg. SSIM (Structural Similarity) across the test set """
 	pass
 
+def save_model(model, model_name, location):
+	model_out_path = location + model_name + ".pth"
+	torch.save(model, model_out_path)
+	print("Model saved to {}".format(model_out_path))
 
 if __name__ == "__main__":
 	# get the arguments
@@ -177,10 +181,11 @@ if __name__ == "__main__":
 
 	trained_model = train_model(model, loss, train_loader, val_loader, num_epochs, main_hyperparameters)
 
+	# save the best model
+	save_model(trained_model, main_hyperparameters, "save_models/")
+
 	# avg_psnr_score_train = test_psnr(trained_model, train_loader)
 	# avg_psnr_score_test = test_psnr(trained_model, test_loader)
-
-	# print("Hyperparameters: ", main_hyperparameters)
 
 	# print("AVG PSNR Score on train: ", avg_psnr_score_train)
 	# print("AVG PSNR Score on test: ", avg_psnr_score_test)
