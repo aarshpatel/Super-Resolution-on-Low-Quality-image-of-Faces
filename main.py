@@ -130,9 +130,9 @@ def test_ssim(model):
 	pass
 
 def save_model(model, model_name, location):
-	model.cpu() # convert the gpu trained model to cpu (for later use)
 	model_out_path = location + model_name + ".pth"
-	torch.save(model, model_out_path)
+	torch.save(model.state_dict(), model_out_path)
+	# torch.save(model, model_out_path)
 	print("Model saved to {}".format(model_out_path))
 
 if __name__ == "__main__":
