@@ -1,9 +1,13 @@
-""" Script to preprocess all images in the Labeled Faces in the Wild Dataset """
+""" Script to preprocess (crop, blur, pixelate) all images in the Labeled Faces in the Wild Dataset """
 
 from PIL import Image, ImageFilter
 import numpy as np
-import cv2 
 import os
+import cv2 #opencv
+
+# TODO
+# 1) Make the code take in any dataset and apply any size crop, blurring, pixelation
+# 2) Should be highly customizable
 
 def crop_img_to_size(img, size, output):
     """ Apply crop to image """
@@ -12,7 +16,6 @@ def crop_img_to_size(img, size, output):
     top = (height - size)/2
     right = (width + size)/2
     bottom = (height + size)/2
-
     img = img.crop((left, top, right, bottom))
     return img
 
@@ -34,45 +37,55 @@ def pixelate(image, pixel_size):
 
     return image
 
-def crop_images(lfw_location, output_location, crop_size):
-    print("Cropping all LFW images...")
-    for subdir, dirs, files in os.walk(lfw_location):
+def grayscale(img):
+    """ Grayscale an image """
+    img_gray = cv2.cvtColor(np.array(img), cv2.COLOR_BGR2GRAY)
+    return Image.fromarray(img_gray)
+
+def create_train_test_val_sets(original_dataset_location):
+    """ Load all images from the dataset and create train/val/test sets"""
+    all_images = []
+    file_names = []
+    for subdir, _, files in os.walk(original_dataset_location):
         for file in files:
             image_file_path = os.path.join(subdir, file)
             if image_file_path.endswith(".jpg"):
+                file_names.append(file)
                 img = Image.open(image_file_path)
-                crop_img = crop_img_to_size(img, crop_size, None)
-                crop_img.save(output_location + file)
+                img = crop_img_to_size(img, 110, None)
+                img = grayscale(img)
+                img = np.array(img)
+                img = np.expand_dims(img, axis=0)
+                all_images.append(img)
 
-def blur_images(lfw_location, output_location, filter_sizes):
-    print("Blurring all images in LFW...")
-    for idx, fn in enumerate(os.listdir(lfw_location)):
-        image_file_path = lfw_location + fn
-        if image_file_path.endswith(".jpg"):
-            if idx % 1000 == 0:
-                print("{0} images processed...".format(idx+1))
-            img = Image.open(image_file_path)
-            for filter_size in filter_sizes:
-                blurred_image = apply_gaussian_blur(img, filter_size)
-                blurred_image.save(output_location + "filter_" + str(filter_size) + "/" + fn)
+    print("Num of images in the dataset: ", len(all_images))
+    all_images = np.array(all_images)
+    print(all_images.shape)
+    return
+    train = all_images[:8000, :, :, :]
+    val = all_images[8000:10646, :, :, :]
+    test = all_images[10646:, :, :, :]
 
-def pixelate_images(lfw_location, output_location, pixelation_sizes):
-    print("Pixelating all images in LFW...")
-    for idx, fn in enumerate(os.listdir(lfw_location)):
-        image_file_path = lfw_location + fn
-        if image_file_path.endswith(".jpg"):
-            if idx % 1000 == 0:
-                print("{0} images processed...".format(idx))
-            img = Image.open(image_file_path)
-            for size in sizes:
-                pixelated_image = pixelate(img, size)
-                pixelated_image.save(output_location + "size_" + str(size) + "/" + fn)
+    print("Making the train/val/test sets...")
+    num_img = 0
+    print("Making train dataset ({0} num of images)".format(train.shape[0]))
+    for row in train:
+        img = Image.fromarray(row.reshape(110, 110))
+        print("Saving file: ", file_names[num_img])
+        img.save("../data/lfw_preprocessed/cropped/" + "/train/" + "{0}".format(file_names[num_img]))
+        num_img += 1
+    
+    print("Making val dataset ({0} num of images)".format(val.shape[0]))
+    for row in val:
+        img = Image.fromarray(row.reshape(110, 110))
+        img.save("../data/lfw_preprocessed/cropped/" + "/val/" + "{0}".format(file_names[num_img]))
+        num_img += 1
+    
+    print("Making test dataset ({0} num of images)".format(test.shape[0]))
+    for row in test:
+        img = Image.fromarray(row.reshape(110, 110))
+        img.save("../data/lfw_preprocessed/cropped/" + "/test/" + "{0}".format(file_names[num_img]))
+        num_img += 1
 
-crop_size = 110
-crop_images("../data/lfw/", "../data/preprocessed_lfw/cropped/", crop_size)
-
-filters = [4, 6, 8]
-blur_images("../data/preprocessed_lfw/cropped/", "../data/preprocessed_lfw/blurred/", filters)
-
-sizes = [6,8,12]
-pixelate_images("../data/preprocessed_lfw/cropped/", "../data/preprocessed_lfw/pixelated/", sizes)
+if __name__ == '__main__':
+    create_train_test_val_sets("../data/lfw/")

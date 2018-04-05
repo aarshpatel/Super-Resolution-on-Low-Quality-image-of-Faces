@@ -7,19 +7,12 @@ class ThreeLayerCNNBasline(nn.Module):
     def __init__(self, batchnorm=False):
 
         super(ThreeLayerCNNBasline,self).__init__()
-
-        self.use_batchnorm = batchnorm
-
         self.conv1 = nn.Conv2d(1,128,kernel_size=9);
-
         self.relu1 = nn.ReLU();
-
         self.conv2 = nn.Conv2d(128,64,kernel_size=3);
-
         self.relu2 = nn.ReLU();
-
         self.conv3 = nn.Conv2d(64,1,kernel_size=5);
-
+        
         # add bilinear upsampling
         self.upsample = nn.modules.Upsample(size=(110, 110), mode="bilinear")
 
@@ -31,5 +24,5 @@ class ThreeLayerCNNBasline(nn.Module):
         out = self.relu2(out)
         out = self.conv3(out)
         out = self.upsample(out)
-        
+
         return out
