@@ -74,9 +74,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, m
 			epoch_loss += loss.data[0]
 
 			# calculate the batch psnr
-			psnr_mse = nn.MSELoss()
-			mse = psnr_mse(model_out, target.float())
-			psnr = 20 * log10(255/np.sqrt(mse.data[0]))
+			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
 			total_epoch_psnr += psnr
 
 			# backprop
