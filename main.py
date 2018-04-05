@@ -11,9 +11,10 @@ from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
 from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
+from loss import pixel_loss
 
 
-def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperparameters):
+def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, model_hyperparameters):
 	"""
 	Train a 'facial reconstruction' model given the arguments
 
@@ -24,8 +25,8 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 	lr: regularization of the optimizer, Adam
 	"""
 
-	if loss == "mse":
-		criterion = nn.MSELoss()
+	if loss == "pixel":
+		criterion = pixel_loss
 
 	optimizer = optim.Adam(model.parameters(),lr=lr)
 
@@ -61,7 +62,7 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			model_out = model(input.float())
 
 			# compute the loss function
-			loss = criterion(model_out, target.float())
+			loss = criterion(model_out, target.float(), input_size*input_size)
 
 			# store the iteration loss after every 500 iterations
 			if iterations % 1 == 0:
@@ -70,8 +71,10 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 			# aggregate the epoch loss
 			epoch_loss += loss.data[0]
 
-			# calculate the psnr
-			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
+			# calculate the batch psnr
+			psnr_mse = nn.MSELoss()
+			mse = psnr_mse(model_out, target.float())
+			psnr = 20 * log10(255/np.sqrt(mse.data[0]))
 			total_epoch_psnr += psnr
 
 			# backprop
@@ -82,10 +85,11 @@ def train_model(model, loss, train_loader, val_loader, num_epochs, model_hyperpa
 
 			print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(train_loader), loss.data[0]))
 
-		# compute the train/val psnr for each iteration
+		# compute the train for each batch
 		avg_epoch_psnr = total_epoch_psnr / len(train_loader)
 		training_psnr.append(avg_epoch_psnr)
 
+		# compute the val for each batch
 		avg_val_psnr = test_psnr(model, val_loader)
 		validation_psnr.append(avg_val_psnr)
 
@@ -163,7 +167,7 @@ if __name__ == "__main__":
     print("Hyperparameters: ", main_hyperparameters)
 
     # get the training data
-    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=None)
+    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=10)
     # train_mean = train_dset.train_mean
     train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
@@ -180,7 +184,8 @@ if __name__ == "__main__":
     if use_cuda:
         model = model.cuda()
 
-    trained_model = train_model(model, loss, train_loader, val_loader, num_epochs, main_hyperparameters)
+    input_size = 110
+    trained_model = train_model(model, input_size, loss, train_loader, val_loader, num_epochs, main_hyperparameters)
 
     # save the best model
     save_model(trained_model, main_hyperparameters, "saved_models/")
