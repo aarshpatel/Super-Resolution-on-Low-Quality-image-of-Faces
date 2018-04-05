@@ -163,8 +163,8 @@ if __name__ == "__main__":
     loss = opt.loss
     num_workers = opt.threads
 
-    main_hyperparameters = "{0}_{1}_{2}_{3}_{4}_{5}_{6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.num_epochs, opt.batch_size)
-    
+    main_hyperparameters = "{0}_{1}_{2}_{3}_{4}_{5}_{6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
+
     print("Hyperparameters: ", main_hyperparameters)
 
     # get the training data
