@@ -167,7 +167,7 @@ if __name__ == "__main__":
     print("Hyperparameters: ", main_hyperparameters)
 
     # get the training data
-    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=10)
+    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped/", method, size, "train", train_mean=None, total_num_images=None)
     # train_mean = train_dset.train_mean
     train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
