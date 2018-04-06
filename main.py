@@ -7,12 +7,17 @@ from math import log10
 import argparse
 import numpy as np
 import copy
+import torchvision.utils as vutils
+
+from tensorboardX import SummaryWriter
+
 from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
 from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import pixel_loss
 
+ 
 def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, lr, model_hyperparameters):
 	"""
 	Train a 'facial reconstruction' model given the arguments
@@ -28,6 +33,9 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 
 	if loss == "pixel":
 		criterion = nn.MSELoss()
+
+	# create a Tensorboard Summarywriter
+	writer = SummaryWriter("./runs/")
 
 	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=.001)
 
@@ -46,6 +54,8 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 		total_epoch_psnr = 0
 
 		for iteration, batch in enumerate(train_loader, 1):
+
+			
 			iterations += 1
 			input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
 
@@ -56,35 +66,57 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 
 			# zero out the gradients
 			optimizer.zero_grad()
+
 			# compute output from cnn
 			model_out = model(input.float())
-			# compute the loss function
 
+			# compute the train loss function
 			loss = criterion(model_out, target.float())
-			# store the iteration loss after every 500 iterations
-			if iterations % 500 == 0:
+			
+			# store the iteration loss after every 100 iterations
+			# also save image afte every 100 iterations
+			if iterations % 100 == 0:
+				writer.add_scalar("Train/Loss", loss, iterations)			
+
+				x = vutils.make_grid(model_out, normalize=True, scale_each=True)
+				writer.add_image('Image', x, iterations)
+
 				training_loss_for_iterations.append((iterations, loss.data[0]))
+
 			# aggregate the epoch loss
 			epoch_loss += loss.data[0]
+
 			# calculate the batch psnr
 			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
 			total_epoch_psnr += psnr
+
 			# backprop
 			loss.backward()
+
 			# perform a gradient step
 			optimizer.step()
-			if iterations % 500 == 0:
-				print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iterations, len(train_loader), loss.data[0]))
+
+			# check the gradients of the model
+			for tag, value in model.named_parameters():
+				tag = tag.replace('.', '/')
+				writer.add_histogram(tag, to_np(value), iteration)
+				writer.add_histogram(tag+'/grad', to_np(value.grad), iteration)
+
+			print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(train_loader), loss.data[0]))
 
 		# compute the train for each batch
 		avg_epoch_psnr = total_epoch_psnr / len(train_loader)
 		training_psnr.append(avg_epoch_psnr)
 		print("Epoch Training PSNR: ", avg_epoch_psnr)
 
+		writer.add_scalar("Train/PSNR", avg_epoch_psnr, epoch)
+
 		# compute the val for each batch
 		avg_val_psnr = test_psnr(model, val_loader)
 		validation_psnr.append(avg_val_psnr)
 		print("Epoch Valiaation PSNR: ", avg_val_psnr)
+
+		writer.add_scalar("Val/PSNR", avg_val_psnr, epoch)
 
 		# if we find a model that does better in the val psnr then save its weights
 		if avg_val_psnr > best_val_psnr:
@@ -92,6 +124,7 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			best_model_weights = copy.deepcopy(model.state_dict())
 
 		print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(train_loader)))
+
 
 	# plot the training loss and train/val psnr values
 	plot_training_loss(training_loss_for_iterations, "figures/{0}_training_loss.png".format(model_hyperparameters))
@@ -101,6 +134,9 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 
 	model.load_state_dict(best_model_weights)
 	return model
+
+def to_np(x):
+    return x.data.cpu().numpy()
 
 def test_psnr(model, data_loader):
 	""" Calculate the avg psnr across the test set """
