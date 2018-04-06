@@ -74,11 +74,11 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			loss = criterion(model_out, target.float())
 			
 			# store the iteration loss after every 100 iterations
-			# also save image afte every 100 iterations
+			# also save image after every 100 iterations
 			if iterations % 100 == 0:
 				writer.add_scalar("Train/Loss", loss, iterations)			
 
-				x = vutils.make_grid(model_out, normalize=True, scale_each=True)
+				x = vutils.make_grid(model_out.data, normalize=True)
 				writer.add_image('Image', x, iterations)
 
 				training_loss_for_iterations.append((iterations, loss.data[0]))
