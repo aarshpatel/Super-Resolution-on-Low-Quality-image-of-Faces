@@ -75,11 +75,22 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			
 			# store the iteration loss after every 100 iterations
 			# also save image after every 100 iterations
-			if iterations % 100 == 0:
+			if iterations % 1 == 0:
+
 				writer.add_scalar("Train/Loss", loss, iterations)			
 
-				x = vutils.make_grid(model_out.data, normalize=True)
-				writer.add_image('Image', x, iterations)
+				model_output_image = model_out.data
+				model_input_image = input.data.float()
+				model_target_image = target.data.float()
+
+				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
+				vis_image = torch.cat((model_input_image, model_target_image))
+
+				x = vutils.make_grid(vis_image, normalize=True)
+				y = vutils.make_grid(model_output_image, normalize=True)
+
+				writer.add_image('Input-Image', x, iterations)
+				writer.add_image('Reconsructed-Image', y, iterations)
 
 				training_loss_for_iterations.append((iterations, loss.data[0]))
 
