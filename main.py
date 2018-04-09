@@ -8,6 +8,8 @@ import argparse
 import numpy as np
 import copy
 import time
+import os
+import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
@@ -50,7 +52,6 @@ def train(train_loader, model, criterion, optimizer, epoch):
 			loss.backward()
 			optimizer.step()
 
-
 			# measure the time it takes to train for one epoch
 			batch_time_meter.update(time.time() - start)			
 			start = time.time()
@@ -82,12 +83,12 @@ def train(train_loader, model, criterion, optimizer, epoch):
 			# 	writer.add_histogram(tag, to_np(value), iteration)
 			# 	writer.add_histogram(tag+'/grad', to_np(value.grad), iteration)
 
-			if i % 100 == 0:
+			if iteration % 100 == 0:
 				print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
 					'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(
-						epoch, i, len(train_loader), batch_time=batch_time_meter,
+						epoch, iteration, len(train_loader), batch_time=batch_time_meter,
 						loss=losses_meter, psnr=psnr_meter))
 
 	# log value to tensorboard or visdom
@@ -150,12 +151,12 @@ def validate(val_loader, model, criterion, epoch):
 		batch_time_meter.update(time.time() - start)			
 		start = time.time()
 
-		if i % 100 == 0:
+		if iteration % 100 == 0:
 			print('Test: [{0}/{1}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
 					'PSNR@1 {psnr.val:.3f} ({psnr.avg:.3f})'.format(
-						i, len(val_loader), batch_time=batch_time_meter, loss=losses_meter,
+						iteration, len(val_loader), batch_time=batch_time_meter, loss=losses_meter,
 						psnr=psnr_meter))
 
 	print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
@@ -203,72 +204,85 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
     if is_best:
         shutil.copyfile(filename, 'model_runs/%s/'%(name) + 'model_best.pth.tar')
 
+def exp_learning_rate_decay(optimizer, epoch, init_lr=.001, lr_decay_epoch=2):
+	""" Decay the learning rate by some amount after some number of epochs """
+	lr = init_lr * (.1 ** (epoch // lr_decay_epoch)) # exponential decay
+
+	if epoch % lr_decay_epoch == 0:
+		print("LR is set to {}".format(lr))
+	
+	for param_group in optimizer.param_groups:
+		param_group["lr"] = lr
+	
+	return optimizer
+
 if __name__ == "__main__":
-    # get the arguments
-    parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-    parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
-    parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
-    parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
-    parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
-    parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
-    parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
-    parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
-    parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
+	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
+	parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
+	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
+	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
+	parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
+	parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
+	parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
+	parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
+	parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
 	parser.add_argument('--weight-decay', type=float, default=1e-4, help="weight decay applied to the optimizer")
-    parser.add_argument('--cuda', action='store_true', help='use cuda?')
-    parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
+	parser.add_argument('--cuda', action='store_true', help='use cuda?')
+	parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
 	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
 	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
 
-    opt = parser.parse_args()
+	global opt, writer, best_avg_psnr
+	opt = parser.parse_args()
 	writer = SummaryWriter("./runs/")
-	best_psnr_avg = 0
+	best_avg_psnr = 0
 
-	global opt, writer, best_psnr_avg
-
-    num_epochs = opt.epochs
-    lr = opt.lr
-    method = opt.method
-    size = opt.size
-    batch_size = opt.batch_size
-    use_cuda = opt.cuda
-    loss = opt.loss
-    num_workers = opt.threads
+	num_epochs = opt.epochs
+	lr = opt.lr
+	method = opt.method
+	size = opt.size
+	batch_size = opt.batch_size
+	use_cuda = opt.cuda
+	loss = opt.loss
+	num_workers = opt.threads
 	weight_decay = opt.weight_decay
 
-    main_hyperparameters = "{0}_{1}_{2}_{3}_{4}_{5}_{6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
+	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
 
-    print("Hyperparameters: ", main_hyperparameters)
+	print("Hyperparameters: ", main_hyperparameters)
 
-    # get the training data
-    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "train", train_mean=None, total_num_images=None)
-    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+	# get the training data
+	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "train", train_mean=None, total_num_images=None)
+	train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
-    # get the validation set
-    val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "val")
-    val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
+	# get the validation set
+	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "val")
+	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
-    # get the test set
-    test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "test")
-    test_loader = DataLoader(test_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
+	# get the test set
+	# test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "test")
+	# test_loader = DataLoader(test_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the model
-    model = ThreeLayerCNNBasline()
+	model = ThreeLayerCNNBasline()
 
 	# get the loss function
 	if loss == "pixel":
 		if use_cuda: criterion = nn.MSELoss().cuda()
-		else:        critertion = nn.MSELoss()
+		else:        criterion = nn.MSELoss()
 	elif loss == "perceptual":
 		print("loading the perceptual loss")
 
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=weight_decay)
 
-    if use_cuda:
-        model = model.cuda()
+	if use_cuda:
+		model = model.cuda()
 
 	for epoch in range(num_epochs):
+
+		# adjust the learning rate
+		optimizer = exp_learning_rate_decay(optimizer=optimizer, epoch=epoch, init_lr=lr, lr_decay_epoch=1)
 
 		# trains the model for one epoch
 		train(train_loader, model, criterion, optimizer, epoch)
@@ -277,12 +291,12 @@ if __name__ == "__main__":
 		psnr_avg = validate(val_loader, model, criterion, epoch)
 
 		# remember the best psnr value and save the checkpoint model
-		is_best = psnr_avg > best_psnr_avg
-		best_psnr_val = max(psnr_avg, best_psnr_val)
+		is_best = psnr_avg > best_avg_psnr 
+		best_avg_psnr = max(psnr_avg, best_avg_psnr)
 		save_checkpoint(main_hyperparameters,{
-            'epoch': epoch + 1,
-            'state_dict': model.state_dict(),
-            'best_psnr': best_psnr_val,
-        }, is_best)
-	
-	print("Best PSNR on the validation set: {}", best_psnr_val)
+			'epoch': epoch + 1,
+			'state_dict': model.state_dict(),
+			'best_psnr': best_avg_psnr,
+		}, is_best)
+
+	print("Best PSNR on the validation set: {}", best_avg_psnr)
