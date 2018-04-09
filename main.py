@@ -164,6 +164,8 @@ def validate(val_loader, model, criterion, epoch):
 		writer.add_scalar("Val/PSNR", psnr_meter.avg, epoch)
 		writer.add_scalar("Val/Loss", losses_meter.avg, epoch)		
 
+	return psnr_meter.avg
+
 def test_ssim(model):
 	""" Calculate the avg. SSIM (Structural Similarity) across the test set """
 	pass
@@ -191,6 +193,16 @@ def save_model(model, model_name, location):
 	# torch.save(model, model_out_path)
 	print("Model saved to {}".format(model_out_path))
 
+def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
+    """Saves model checkpoint to disk"""
+    directory = "model_runs/%s/"%(name)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filename = directory + filename
+    torch.save(state, filename)
+    if is_best:
+        shutil.copyfile(filename, 'model_runs/%s/'%(name) + 'model_best.pth.tar')
+
 if __name__ == "__main__":
     # get the arguments
     parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
@@ -210,8 +222,9 @@ if __name__ == "__main__":
 
     opt = parser.parse_args()
 	writer = SummaryWriter("./runs/")
+	best_psnr_avg = 0
 
-	global opt, writer
+	global opt, writer, best_psnr_avg
 
     num_epochs = opt.epochs
     lr = opt.lr
@@ -229,15 +242,15 @@ if __name__ == "__main__":
 
     # get the training data
     train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "train", train_mean=None, total_num_images=None)
-    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers, train=True)
+    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     # get the validation set
     val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "val")
-    val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers, train=False)
+    val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
     # get the test set
     test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "test")
-    test_loader = DataLoader(test_dset, shuffle=True, num_workers=num_workers)
+    test_loader = DataLoader(test_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the model
     model = ThreeLayerCNNBasline()
@@ -261,3 +274,15 @@ if __name__ == "__main__":
 		train(train_loader, model, criterion, optimizer, epoch)
 
 		# evaluate on the validation set	
+		psnr_avg = validate(val_loader, model, criterion, epoch)
+
+		# remember the best psnr value and save the checkpoint model
+		is_best = psnr_avg > best_psnr_avg
+		best_psnr_val = max(psnr_avg, best_psnr_val)
+		save_checkpoint(main_hyperparameters,{
+            'epoch': epoch + 1,
+            'state_dict': model.state_dict(),
+            'best_psnr': best_psnr_val,
+        }, is_best)
+	
+	print("Best PSNR on the validation set: {}", best_psnr_val)
