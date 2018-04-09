@@ -56,34 +56,24 @@ def train(train_loader, model, criterion, optimizer, epoch):
 			batch_time_meter.update(time.time() - start)			
 			start = time.time()
 
-			# store the iteration loss after every 100 iterations
-			# also save image after every 100 iterations
-			# if iterations % 1 == 0:
-
-			# 	writer.add_scalar("Train/Loss", loss, iterations)			
-
-			# 	model_output_image = model_out.data
-			# 	model_input_image = input.data.float()
-			# 	model_target_image = target.data.float()
-
-			# 	# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
-			# 	vis_image = torch.cat((model_input_image, model_target_image))
-
-			# 	x = vutils.make_grid(vis_image, normalize=True)
-			# 	y = vutils.make_grid(model_output_image, normalize=True)
-
-			# 	writer.add_image('Input-Image', x, iterations)
-			# 	writer.add_image('Reconsructed-Image', y, iterations)
-
-			# 	training_loss_for_iterations.append((iterations, loss.data[0]))
-
-			# check the gradients of the model
-			# for tag, value in model.named_parameters():
-			# 	tag = tag.replace('.', '/')
-			# 	writer.add_histogram(tag, to_np(value), iteration)
-			# 	writer.add_histogram(tag+'/grad', to_np(value.grad), iteration)
-
 			if iteration % 100 == 0:
+
+				model_output_image = output.data
+				model_input_image = input.data.float()
+				model_target_image = target.data.float()
+
+				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
+				vis_image = torch.cat((model_input_image, model_target_image))
+
+				x = vutils.make_grid(vis_image, normalize=True)
+				y = vutils.make_grid(model_output_image, normalize=True)
+
+				writer.add_image('Input-Image', x, iterations)
+				writer.add_image('Reconsructed-Image', y, iterations)
+					
+
+
+
 				print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -93,8 +83,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
 	# log value to tensorboard or visdom
 	if opt.tensorboard:
-		writer.add_scalar("Train/PSNR", psnr_meter.avg, epoch)
-		writer.add_scalar("Train/Loss", losses_meter.avg, epoch)
+		writer.add_scalar("PSNR/Train", psnr_meter.avg, epoch)
+		writer.add_scalar("Loss/Train", losses_meter.avg, epoch)
 
 def to_np(x):
     return x.data.cpu().numpy()
@@ -155,17 +145,17 @@ def validate(val_loader, model, criterion, epoch):
 			print('Test: [{0}/{1}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-					'PSNR@1 {psnr.val:.3f} ({psnr.avg:.3f})'.format(
+					'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(
 						iteration, len(val_loader), batch_time=batch_time_meter, loss=losses_meter,
 						psnr=psnr_meter))
 
 	print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
 
 	if opt.tensorboard:
-		writer.add_scalar("Val/PSNR", psnr_meter.avg, epoch)
-		writer.add_scalar("Val/Loss", losses_meter.avg, epoch)		
+		writer.add_scalar("PSNR/Val", psnr_meter.avg, epoch)
+		writer.add_scalar("Loss/Val", losses_meter.avg, epoch)		
 
-	return psnr_meter.avg
+	return losses_meter.avg, psnr_meter.avg
 
 def test_ssim(model):
 	""" Calculate the avg. SSIM (Structural Similarity) across the test set """
@@ -203,18 +193,6 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, 'model_runs/%s/'%(name) + 'model_best.pth.tar')
-
-def exp_learning_rate_decay(optimizer, epoch, init_lr=.001, lr_decay_epoch=2):
-	""" Decay the learning rate by some amount after some number of epochs """
-	lr = init_lr * (.1 ** (epoch // lr_decay_epoch)) # exponential decay
-
-	if epoch % lr_decay_epoch == 0:
-		print("LR is set to {}".format(lr))
-	
-	for param_group in optimizer.param_groups:
-		param_group["lr"] = lr
-	
-	return optimizer
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
@@ -276,27 +254,30 @@ if __name__ == "__main__":
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=weight_decay)
 
+	# set the scheduler
+	scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", patience=5)
+
 	if use_cuda:
 		model = model.cuda()
 
 	for epoch in range(num_epochs):
 
-		# adjust the learning rate
-		optimizer = exp_learning_rate_decay(optimizer=optimizer, epoch=epoch, init_lr=lr, lr_decay_epoch=1)
-
 		# trains the model for one epoch
 		train(train_loader, model, criterion, optimizer, epoch)
 
 		# evaluate on the validation set	
-		psnr_avg = validate(val_loader, model, criterion, epoch)
+		val_loss, val_psnr_avg = validate(val_loader, model, criterion, epoch)
+
+		# adjust the learning rate if val loss stops improving
+		scheduler.step(val_loss)
 
 		# remember the best psnr value and save the checkpoint model
-		is_best = psnr_avg > best_avg_psnr 
-		best_avg_psnr = max(psnr_avg, best_avg_psnr)
+		is_best = val_psnr_avg > best_avg_psnr 
+		best_avg_psnr = max(val_psnr_avg, best_avg_psnr)
 		save_checkpoint(main_hyperparameters,{
 			'epoch': epoch + 1,
 			'state_dict': model.state_dict(),
 			'best_psnr': best_avg_psnr,
 		}, is_best)
 
-	print("Best PSNR on the validation set: {}", best_avg_psnr)
+	print("Best PSNR on the validation set: {}".format(best_avg_psnr))
