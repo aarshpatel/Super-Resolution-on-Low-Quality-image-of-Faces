@@ -7,56 +7,28 @@ from math import log10
 import argparse
 import numpy as np
 import copy
+import time
 import torchvision.utils as vutils
-
 from tensorboardX import SummaryWriter
-
 from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
 from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import pixel_loss
 
- 
-def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, lr, model_hyperparameters):
-	"""
-	Train a 'facial reconstruction' model given the arguments
 
-	model: pytorch model (ex. ThreeLayerCNNBaseline)
-	input_size: size of the input image (eg. 110)
-	train_loader: pytorch data loader for the training data
-	val_loader: pytorch data loader for the validation data
-	num_epochs: num of epochs to train the model
-	lr: regularization of the optimizer, Adam
-	model_hyperparameters: string representing the hyperparameters used training
-	"""
+def train(train_loader, model, criterion, optimizer, epoch):
+	""" Train the model for one epoch """
 
-	if loss == "pixel":
-		criterion = nn.MSELoss()
+	batch_time_meter = AverageMeter()
+	losses_meter = AverageMeter()
+	psnr_meter = AverageMeter()
 
-	# create a Tensorboard Summarywriter
-	writer = SummaryWriter("./runs/")
-
-	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=.001)
-
-	training_psnr = []
-	validation_psnr = []
-	training_loss_for_iterations = []
-
-	best_val_psnr = 0.0
-	best_model_weights = copy.deepcopy(model.state_dict())
-
-	iterations = 0
-
-	for epoch in range(num_epochs):
-
-		epoch_loss = 0
-		total_epoch_psnr = 0
-
-		for iteration, batch in enumerate(train_loader, 1):
-
-			
-			iterations += 1
+	# set the model to train mode
+	model.train()
+	
+	start = time.time()
+	for iteration, batch in enumerate(train_loader, 1):
 			input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
 
 			# use the GPU
@@ -64,87 +36,64 @@ def train_model(model, input_size, loss, train_loader, val_loader, num_epochs, l
 			    input = input.cuda()
 			    target = target.cuda()
 
+			# compute output from CNN model
+			output = model(input.float())
+			loss = criterion(output, target.float())
+
+			# measure psnr and loss
+			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
+			psnr_meter.update(psnr, input.size(0))
+			losses_meter.update(loss.data[0], input.size(0))
+
 			# zero out the gradients
 			optimizer.zero_grad()
-
-			# compute output from cnn
-			model_out = model(input.float())
-
-			# compute the train loss function
-			loss = criterion(model_out, target.float())
-			
-			# store the iteration loss after every 100 iterations
-			# also save image after every 100 iterations
-			if iterations % 1 == 0:
-
-				writer.add_scalar("Train/Loss", loss, iterations)			
-
-				model_output_image = model_out.data
-				model_input_image = input.data.float()
-				model_target_image = target.data.float()
-
-				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
-				vis_image = torch.cat((model_input_image, model_target_image))
-
-				x = vutils.make_grid(vis_image, normalize=True)
-				y = vutils.make_grid(model_output_image, normalize=True)
-
-				writer.add_image('Input-Image', x, iterations)
-				writer.add_image('Reconsructed-Image', y, iterations)
-
-				training_loss_for_iterations.append((iterations, loss.data[0]))
-
-			# aggregate the epoch loss
-			epoch_loss += loss.data[0]
-
-			# calculate the batch psnr
-			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
-			total_epoch_psnr += psnr
-
-			# backprop
 			loss.backward()
-
-			# perform a gradient step
 			optimizer.step()
 
+
+			# measure the time it takes to train for one epoch
+			batch_time_meter.update(time.time() - start)			
+			start = time.time()
+
+			# store the iteration loss after every 100 iterations
+			# also save image after every 100 iterations
+			# if iterations % 1 == 0:
+
+			# 	writer.add_scalar("Train/Loss", loss, iterations)			
+
+			# 	model_output_image = model_out.data
+			# 	model_input_image = input.data.float()
+			# 	model_target_image = target.data.float()
+
+			# 	# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
+			# 	vis_image = torch.cat((model_input_image, model_target_image))
+
+			# 	x = vutils.make_grid(vis_image, normalize=True)
+			# 	y = vutils.make_grid(model_output_image, normalize=True)
+
+			# 	writer.add_image('Input-Image', x, iterations)
+			# 	writer.add_image('Reconsructed-Image', y, iterations)
+
+			# 	training_loss_for_iterations.append((iterations, loss.data[0]))
+
 			# check the gradients of the model
-			for tag, value in model.named_parameters():
-				tag = tag.replace('.', '/')
-				writer.add_histogram(tag, to_np(value), iteration)
-				writer.add_histogram(tag+'/grad', to_np(value.grad), iteration)
+			# for tag, value in model.named_parameters():
+			# 	tag = tag.replace('.', '/')
+			# 	writer.add_histogram(tag, to_np(value), iteration)
+			# 	writer.add_histogram(tag+'/grad', to_np(value.grad), iteration)
 
-			print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(train_loader), loss.data[0]))
+			if i % 100 == 0:
+				print('Epoch: [{0}][{1}/{2}]\t'
+					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+					'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(
+						epoch, i, len(train_loader), batch_time=batch_time_meter,
+						loss=losses_meter, psnr=psnr_meter))
 
-		# compute the train for each batch
-		avg_epoch_psnr = total_epoch_psnr / len(train_loader)
-		training_psnr.append(avg_epoch_psnr)
-		print("Epoch Training PSNR: ", avg_epoch_psnr)
-
-		writer.add_scalar("Train/PSNR", avg_epoch_psnr, epoch)
-
-		# compute the val for each batch
-		avg_val_psnr = test_psnr(model, val_loader)
-		validation_psnr.append(avg_val_psnr)
-		print("Epoch Valiaation PSNR: ", avg_val_psnr)
-
-		writer.add_scalar("Val/PSNR", avg_val_psnr, epoch)
-
-		# if we find a model that does better in the val psnr then save its weights
-		if avg_val_psnr > best_val_psnr:
-			best_val_psnr = avg_val_psnr
-			best_model_weights = copy.deepcopy(model.state_dict())
-
-		print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(train_loader)))
-
-
-	# plot the training loss and train/val psnr values
-	plot_training_loss(training_loss_for_iterations, "figures/{0}_training_loss.png".format(model_hyperparameters))
-
-	# plot the training psnr and validation psnr after every epoch
-	plot_train_val_psnr(training_psnr, validation_psnr, "figures/{0}_training_validation_psnr.png".format(model_hyperparameters))
-
-	model.load_state_dict(best_model_weights)
-	return model
+	# log value to tensorboard or visdom
+	if opt.tensorboard:
+		writer.add_scalar("Train/PSNR", psnr_meter.avg, epoch)
+		writer.add_scalar("Train/Loss", losses_meter.avg, epoch)
 
 def to_np(x):
     return x.data.cpu().numpy()
@@ -169,9 +118,72 @@ def test_psnr(model, data_loader):
 
 	return avg_psnr / float(len(data_loader))
 
+def validate(val_loader, model, criterion, epoch):
+	""" Validate the model on the validation set """
+	batch_time_meter = AverageMeter()
+	losses_meter = AverageMeter()
+	psnr_meter = AverageMeter()
+
+	# switch to eval mode
+	model.eval()
+
+	start = time.time()
+
+	for iteration, batch in enumerate(val_loader, start=1):
+		input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
+
+		# use the GPU
+		if use_cuda:
+			input = input.cuda()
+			target = target.cuda()
+
+		# compute output from CNN model
+		output = model(input.float())
+		loss = criterion(output, target.float())
+
+		# compute the psnr and loss on the validation set
+		psnr = 20 * log10(255/np.sqrt(loss.data[0]))
+		psnr_meter.update(psnr, input.size(0))
+		losses_meter.update(loss.data[0], input.size(0))
+
+		# measure time
+		batch_time_meter.update(time.time() - start)			
+		start = time.time()
+
+		if i % 100 == 0:
+			print('Test: [{0}/{1}]\t'
+					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+					'PSNR@1 {psnr.val:.3f} ({psnr.avg:.3f})'.format(
+						i, len(val_loader), batch_time=batch_time_meter, loss=losses_meter,
+						psnr=psnr_meter))
+
+	print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
+
+	if opt.tensorboard:
+		writer.add_scalar("Val/PSNR", psnr_meter.avg, epoch)
+		writer.add_scalar("Val/Loss", losses_meter.avg, epoch)		
+
 def test_ssim(model):
 	""" Calculate the avg. SSIM (Structural Similarity) across the test set """
 	pass
+
+class AverageMeter(object):
+    """Computes and stores the average and current value"""
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
 
 def save_model(model, model_name, location):
 	model_out_path = location + model_name + ".pth"
@@ -190,10 +202,16 @@ if __name__ == "__main__":
     parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
     parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
     parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
+	parser.add_argument('--weight-decay', type=float, default=1e-4, help="weight decay applied to the optimizer")
     parser.add_argument('--cuda', action='store_true', help='use cuda?')
     parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
-    parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
+	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
+	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
+
     opt = parser.parse_args()
+	writer = SummaryWriter("./runs/")
+
+	global opt, writer
 
     num_epochs = opt.epochs
     lr = opt.lr
@@ -203,6 +221,7 @@ if __name__ == "__main__":
     use_cuda = opt.cuda
     loss = opt.loss
     num_workers = opt.threads
+	weight_decay = opt.weight_decay
 
     main_hyperparameters = "{0}_{1}_{2}_{3}_{4}_{5}_{6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
 
@@ -210,31 +229,35 @@ if __name__ == "__main__":
 
     # get the training data
     train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "train", train_mean=None, total_num_images=None)
-    # train_mean = train_dset.train_mean
-    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers, train=True)
 
     # get the validation set
     val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "val")
-    val_loader = DataLoader(val_dset, shuffle=True, num_workers=num_workers)
+    val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers, train=False)
 
     # get the test set
     test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "test")
     test_loader = DataLoader(test_dset, shuffle=True, num_workers=num_workers)
 
+	# get the model
     model = ThreeLayerCNNBasline()
+
+	# get the loss function
+	if loss == "pixel":
+		if use_cuda: criterion = nn.MSELoss().cuda()
+		else:        critertion = nn.MSELoss()
+	elif loss == "perceptual":
+		print("loading the perceptual loss")
+
+	# set the optimizer
+	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=weight_decay)
 
     if use_cuda:
         model = model.cuda()
 
-    input_size = 110
-    trained_model = train_model(model, input_size, loss, train_loader, val_loader, num_epochs, lr, main_hyperparameters)
+	for epoch in range(num_epochs):
 
-    # save the best model
-    save_model(trained_model, main_hyperparameters, "saved_models/")
+		# trains the model for one epoch
+		train(train_loader, model, criterion, optimizer, epoch)
 
-    avg_psnr_score_train = test_psnr(trained_model, train_loader)
-    avg_psnr_score_test = test_psnr(trained_model, test_loader)
-
-    print("AVG PSNR Score on train: ", avg_psnr_score_train)
-    print("AVG PSNR Score on test: ", avg_psnr_score_test)
-
+		# evaluate on the validation set	
