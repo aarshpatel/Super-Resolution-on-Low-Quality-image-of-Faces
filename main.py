@@ -68,11 +68,9 @@ def train(train_loader, model, criterion, optimizer, epoch):
 				x = vutils.make_grid(vis_image, normalize=True)
 				y = vutils.make_grid(model_output_image, normalize=True)
 
-				writer.add_image('Input-Image', x, iterations)
-				writer.add_image('Reconsructed-Image', y, iterations)
+				writer.add_image('Input-Image', x, epoch*iteration)
+				writer.add_image('Reconsructed-Image', y, epoch*iteration)
 					
-
-
 
 				print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
@@ -199,6 +197,7 @@ if __name__ == "__main__":
 	parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
 	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
 	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
+	parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
 	parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
 	parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
 	parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
@@ -224,17 +223,23 @@ if __name__ == "__main__":
 	loss = opt.loss
 	num_workers = opt.threads
 	weight_decay = opt.weight_decay
+	grayscale = opt.grayscale
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
 
 	print("Hyperparameters: ", main_hyperparameters)
 
+	if grayscale:
+		image_color = "grayscale"
+	else:
+		image_color = "rgb"
+		
 	# get the training data
-	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "train", train_mean=None, total_num_images=None)
+	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="train", train_mean=None, total_num_images=None)
 	train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
 	# get the validation set
-	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "val")
+	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="val")
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the test set

@@ -7,8 +7,7 @@ from scripts.preprocess_lfw_images import apply_gaussian_blur, pixelate
 
 
 class ObfuscatedDatasetLoader(data.Dataset):
-
-	def __init__(self, dataset_location, method, size, data_type, train_mean=None, total_num_images=None):
+	def __init__(self, dataset_location, method, size, grayscale, data_type, train_mean=None, total_num_images=None):
 		""" 
 		Method: type of obfuscation method - blurred or pixelated
 		Size: the amount of obfuscation applied to the images
@@ -20,10 +19,8 @@ class ObfuscatedDatasetLoader(data.Dataset):
 		# testing - orginal grayscale image
 		def get_dataset():
 			""" Get all of the obfuscated images for a particular method and size """
-
 			x_train = []
 			y_train = []
-
 			for fn in sorted(os.listdir(dataset_location + data_type + "/")):
 				image_file_path = os.path.join(dataset_location + data_type + "/" + fn)
 				if image_file_path.endswith(".jpg"):
@@ -31,8 +28,10 @@ class ObfuscatedDatasetLoader(data.Dataset):
 
 					y_train_img = np.array(img)
 					y_train_img = y_train_img.astype(float)
-					# y_train_img /= 255.0
-					y_train_img = np.expand_dims(y_train_img, axis=0)
+					if not grayscale:
+						y_train_img = y_train_img.transpose(2, 0, 1)
+					else:
+						y_train_img = np.expand_dims(y_train_img, axis=0)
 					y_train.append(y_train_img)
 
 					# apply image obfuscation
@@ -41,8 +40,10 @@ class ObfuscatedDatasetLoader(data.Dataset):
 
 					obfuscated_img_array = np.array(img)
 					obfuscated_img_array = obfuscated_img_array.astype(float)
-					# obfuscated_img_array /= 255.0
-					obfuscated_img_array = np.expand_dims(obfuscated_img_array, axis=0)
+					if not grayscale:
+						obfuscated_img_array = obfuscated_img_array.transpose(2, 0, 1)
+					else:
+						obfuscated_img_array = np.expand_dims(obfuscated_img_array, axis=0)
 					x_train.append(obfuscated_img_array)
 
 			if total_num_images is not None:
@@ -51,6 +52,9 @@ class ObfuscatedDatasetLoader(data.Dataset):
 
 			x_train = np.array(x_train)
 			y_train = np.array(y_train)
+
+			print("X train: ", x_train.shape)
+			print("Y train: ", y_train.shape)
 
 			return x_train, y_train
 
