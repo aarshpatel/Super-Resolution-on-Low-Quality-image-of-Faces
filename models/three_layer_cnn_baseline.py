@@ -15,17 +15,10 @@ class ThreeLayerCNNBasline(nn.Module):
 
     def __init__(self, batchnorm=False):
         super(ThreeLayerCNNBasline,self).__init__()
-        # self.conv_block_1 = ConvBlock(in_channel=1, out_channel=64, kernel_size=3, padding=0, stride=1, pool=False)
-        # self.conv_block_2 = ConvBlock(in_channel=64, out_channel=32, kernel_size=3, padding=0, stride=1, pool=False)
-        # self.conv_block_3 = ConvBlock(in_channel=32, out_channel=16, kernel_size=3, padding=0, stride=1, pool=False)
-        # self.conv_block_4 = ConvBlock(in_channel=16, out_channel=8, kernel_size=3, padding=0, stride=1, pool=False)
-        # self.conv_block_5 = ConvBlock(in_channel=8, out_channel=1, kernel_size=1, padding=0, stride=1, pool=False)
-        # self.upsampling = nn.modules.UpsamplingBilinear2d(size=(110, 110))
-
-        N = 1
+        N = 3
         D_in = 5 
         D_mid = 5
-        D_out = 1
+        D_out = 3
 
         self.model = nn.Sequential(
             nn.Conv2d(N, D_in, kernel_size=(5,5), stride=(1,1), padding=(2,2)),
@@ -39,11 +32,7 @@ class ThreeLayerCNNBasline(nn.Module):
         )
 
     def forward(self,x):
-        # out = self.conv_block_1(x)
-        # out = self.conv_block_2(out)
-        # out = self.conv_block_3(out)
-        # out = self.conv_block_4(out)
-        # out = self.conv_block_5(out)
-        # out = self.upsampling(out)
+        print("Input shape: ", x.size())
         out = self.model(x)
+        print("Output shape: ", out.size())
         return out
