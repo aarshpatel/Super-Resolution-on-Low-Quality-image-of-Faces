@@ -195,13 +195,13 @@ def save_image(input, output, target, filename):
 def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
 	
     """Saves model checkpoint to disk"""
-    directory = "model_runs/%s/" % (name)
+    directory = "saved_models/%s/" % (name)
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename = directory + filename
     torch.save(state, filename)
     if is_best:
-        shutil.copyfile(filename, 'model_runs/%s/' % (name) + 'model_best.pth.tar')
+        shutil.copyfile(filename, 'saved_models/%s/' % (name) + 'model_best.pth.tar')
 
 
 if __name__ == "__main__":
