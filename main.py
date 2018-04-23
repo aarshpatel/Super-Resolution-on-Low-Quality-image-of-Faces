@@ -75,8 +75,11 @@ def train(train_loader, model, criterion, optimizer, epoch):
 					writer.add_image('Reconsructed-Image', y, epoch*iteration)
 					
 				if opt.save_img:					
-					save_img_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter.jpg".format(epoch, iteration)
-					vutils.save_image(model_output_image, filename=save_img_filename)
+					save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
+					save_img_input_target_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_gt.jpg".format(epoch, iteration)
+					vutils.save_image(model_output_image, filename=save_img_output_filename, normalize=True)
+					vutils.save_image(vis_image, filename=save_img_input_target_filename, normalize=True)
+					
 					
 				print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
