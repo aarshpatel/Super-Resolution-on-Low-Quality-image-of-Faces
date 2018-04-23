@@ -22,11 +22,11 @@ class ThreeLayerCNNBasline(nn.Module):
 
         self.model = nn.Sequential(
             nn.Conv2d(N, D_in, kernel_size=(5,5), stride=(1,1), padding=(2,2)),
-            nn.BatchNorm2d(D_in),
             nn.MaxPool2d(2),
-            nn.ReLU(),
             nn.BatchNorm2d(D_in),
+            nn.ReLU(),
             nn.Conv2d(D_in, D_mid, kernel_size=(5,5), stride=(1,1), padding=(2,2)),
+            nn.ReLU(),
             nn.BatchNorm2d(D_mid),
             nn.ConvTranspose2d(D_mid, D_out,kernel_size=(2,2), stride=(2,2)),
         )
