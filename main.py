@@ -14,7 +14,7 @@ import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
-from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
+from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
 from scripts.metrics import calc_psnr
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
@@ -201,10 +201,9 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
     if is_best:
         shutil.copyfile(filename, 'saved_models/%s/' % (name) + 'model_best.pth.tar')
 
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-	parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
+	parser.add_argument("--model", type=str, default="ThreeLayerCNNBaseline", help="type of model to use for facial reconstruction")
 	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
 	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
 	parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
@@ -276,7 +275,7 @@ if __name__ == "__main__":
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the model
-	model = ThreeLayerCNNBasline()
+	model = ThreeLayerCNNBaseline()
 
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
