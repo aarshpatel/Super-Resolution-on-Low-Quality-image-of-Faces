@@ -83,7 +83,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 
 			if opt.save_img:
 				save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
-				vutils.save_image(all_images, filename=save_img_output_filename)
+				vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
 
 			print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
@@ -247,8 +247,8 @@ if __name__ == "__main__":
     #################
     # Normalization #
     #################
-    train_mean = np.array([150.79660111, 115.31313646, 94.28781092])
-    train_std = np.array([52.17929494, 44.20110692, 42.75483222])
+    train_mean = np.array([149.59638197, 114.21029544,  93.41318133])
+    train_std = np.array([52.54902009, 44.34252746, 42.88273568])
     normalize = transforms.Normalize(mean=[mean/255.0 for mean in train_mean],
                                      std=[std/255.0 for std in train_std])
 
