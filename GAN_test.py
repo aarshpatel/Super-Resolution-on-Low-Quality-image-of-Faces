@@ -12,7 +12,7 @@ import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
-from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
+from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
 from models.three_layer_cnn_Disc import ThreeLayerCNNDisc
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
@@ -31,65 +31,65 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
     batch_time_meter = AverageMeter()
     losses_meter = AverageMeter()
     psnr_meter = AverageMeter()
-
-    # set the model to train mode
-    modelD.train()
-
     # setup the loss function (MSE/BCE)
     loss_fn = nn.MSELoss().cuda()
     loss_fn2 = nn.BCELoss().cuda()
+
+    # set the model to train mode
+    modelD.train()
+    modelG.train()
 
     start = time.time()
 
     for iteration, batch in enumerate(train_loader, 1):
         input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
-
         # ==================================================================
         # TRAINING THE DISCRIMINATIVE MODEL
         # ==================================================================
-        modelG.eval()
+
         real_labels = to_var(torch.ones(batch_size))
         fake_labels = to_var(torch.zeros(batch_size))
-        outputs = modelD(input)
+
+        # Feed Discriminator GT images, and labels = REAL
+        outputs = modelD(target)
         d_loss_real = loss_fn2(outputs, real_labels)
         real_score = outputs
 
-
-        # First term of the loss is always zero since fake_labels == 0
-        z = to_var(torch.randn(batch_size, 64))
-        fake_images = modelG(z)
+        # Feed Discriminator Generated images, and labels = FAKE
+        fake_images = modelG(input)
         outputs = modelD(fake_images)
         d_loss_fake = loss_fn2(outputs, fake_labels)
         fake_score = outputs
 
-        # Backprop + Optimize
+        # Update Gradients for Discriminator
         lossD = d_loss_real + d_loss_fake
         modelD.zero_grad()
         lossD.backward()
         optimizerD.step()
-
         # ==================================================================
         # TRAINING THE GENERATIVE MODEL
         # ==================================================================
-        modelG.train()
-        z = to_var(torch.randn(batch_size, 64))
-        fake_images = modelG(z)
+
+        fake_images = modelG(input)
         outputs2 = modelD(fake_images)
         if loss_type == "perceptual":
-            vgg_loss_output = vgg_loss(outputs2)
-            vgg_loss_target = vgg_loss(real_labels)
-            lossG = loss_fn(vgg_loss_output, vgg_loss_target)
+            vgg_loss_output = vgg_loss(fake_images)
+            vgg_loss_target = vgg_loss(target)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.5) + (loss_fn2(outputs2,fake_labels)*.5)
         else:
-            lossG = loss_fn(outputs2, real_labels)
+            lossG = (loss_fn(fake_images,target)*.5) + (loss_fn2(outputs2, fake_labels)*.5)
 
         # Backprop + Optimize
         modelD.zero_grad()
         modelG.zero_grad()
         lossG.backward()
         optimizerG.step()
+        # ==================================================================
+        # UPDATING STATISTICS
+        # ==================================================================
 
         # measure psnr and loss
-        mse = loss_fn(outputs, target)
+        mse = loss_fn(fake_images, target)
         psnr = calc_psnr(mse.data[0])
         psnr_meter.update(psnr, input.size(0))
         losses_meter.update(lossG.data[0], input.size(0))
@@ -97,6 +97,10 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         # measure the time it takes to train for one epoch
         batch_time_meter.update(time.time() - start)
         start = time.time()
+
+        # ==================================================================
+        # PRINTING STATISTICS
+        # ==================================================================
 
         if iteration % 500 == 0:
             print('Epoch [%d/%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, 200, iteration + 1, 600, lossD.data[0], lossG.data[0], real_score.data.mean(), fake_score.data.mean()))
@@ -106,7 +110,7 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
             if not os.path.exists(new_output_dir):
                 os.makedirs(new_output_dir)
 
-            model_output_image = outputs.data.float()
+            model_output_image = fake_images.data.float()
             model_input_image = input.data.float()
             model_target_image = target.data.float()
 
@@ -131,15 +135,13 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
     batch_time_meter = AverageMeter()
     losses_meter = AverageMeter()
     psnr_meter = AverageMeter()
-
+    loss_fn = nn.MSELoss().cuda()
+    loss_fn2 = nn.BCELoss().cuda()
 
     # switch to eval mode
     modelG.eval()
     modelD.eval()
     start = time.time()
-
-    loss_fn = nn.MSELoss().cuda()
-    loss_fn2 = nn.BCELoss().cuda()
 
     for iteration, batch in enumerate(val_loader, start=1):
         input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
@@ -149,33 +151,36 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
 
         real_labels = to_var(torch.ones(batch_size))
         fake_labels = to_var(torch.zeros(batch_size))
-        outputs = modelD(input)
+
+        # Feed Discriminator GT images, and labels = REAL
+        outputs = modelD(target)
         d_loss_real = loss_fn2(outputs, real_labels)
         real_score = outputs
 
-        # First term of the loss is always zero since fake_labels == 0
-        z = to_var(torch.randn(batch_size, 64))
-        fake_images = modelG(z)
+        #  Feed Discriminator Generated images, and labels = FAKE
+        fake_images = modelG(input)
         outputs = modelD(fake_images)
         d_loss_fake = loss_fn2(outputs, fake_labels)
         fake_score = outputs
         lossD = d_loss_real + d_loss_fake
-
         # ==================================================================
         # EVALUATING THE GENERATIVE MODEL
         # ==================================================================
-        z = to_var(torch.randn(batch_size, 64))
-        fake_images = modelG(z)
+
+        fake_images = modelG(input)
         outputs2 = modelD(fake_images)
         if loss_type == "perceptual":
-            vgg_loss_output = vgg_loss(outputs2)
-            vgg_loss_target = vgg_loss(real_labels)
-            lossG = loss_fn(vgg_loss_output, vgg_loss_target)
+            vgg_loss_output = vgg_loss(fake_images)
+            vgg_loss_target = vgg_loss(target)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.5) + (loss_fn2(outputs2,fake_labels)*.5)
         else:
-            lossG = loss_fn(outputs2, real_labels)
+            lossG = (loss_fn(fake_images,target)*.5) + (loss_fn2(outputs2, fake_labels)*.5)
+        # ==================================================================
+        # UPDATING STATISTICS
+        # ==================================================================
 
         # compute the psnr and loss on the validation set
-        mse = loss_fn(outputs, target)
+        mse = loss_fn(fake_images, target)
         psnr = calc_psnr(mse.data[0])
         psnr_meter.update(psnr, input.size(0))
         losses_meter.update(lossG.data[0], input.size(0))
@@ -183,6 +188,9 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # measure time
         batch_time_meter.update(time.time() - start)
         start = time.time()
+        # ==================================================================
+        # PRINTING STATISTICS
+        # ==================================================================
 
         if iteration % 100 == 0:
             print('Epoch [%d/%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, 200, iteration + 1, 600, lossD.data[0], lossG.data[0], real_score.data.mean(),fake_score.data.mean()))
@@ -192,7 +200,7 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
             if not os.path.exists(new_output_dir):
                 os.makedirs(new_output_dir)
 
-            model_output_image = outputs.data.float()
+            model_output_image = fake_images.data.float()
             model_input_image = input.data.float()
             model_target_image = target.data.float()
 
@@ -329,7 +337,7 @@ if __name__ == "__main__":
     # ============================
 
     # get the model Generative
-    modelG = ThreeLayerCNNBasline()
+    modelG = ThreeLayerCNNBaseline()
 
     # set the optimizer Generative
     optimizerG = optim.Adam(modelG.parameters(), lr=lr, weight_decay=weight_decay)

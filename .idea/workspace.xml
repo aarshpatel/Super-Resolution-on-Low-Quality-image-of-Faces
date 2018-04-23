@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="59d87024-8f45-4f98-8a35-d137a17191bc" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/GAN_test.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/models/three_layer_cnn_baseline.py" afterPath="$PROJECT_DIR$/models/three_layer_cnn_baseline.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/GAN_test.py" afterPath="$PROJECT_DIR$/GAN_test.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,77 +19,39 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="loss.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/loss.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="33" column="35" lean-forward="false" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
-              <folding>
-                <element signature="e#49#60#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="three_layer_cnn_Disc.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/models/three_layer_cnn_Disc.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="150">
-              <caret line="10" column="7" lean-forward="true" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-                <element signature="e#1003#1087#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GAN_test.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GAN_test.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/GAN_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="253" column="26" lean-forward="true" selection-start-line="253" selection-start-column="26" selection-end-line="253" selection-end-column="26" />
+            <state relative-caret-position="195">
+              <caret line="13" column="41" lean-forward="false" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
               <folding>
-                <element signature="e#620#719#0" expanded="false" />
-                <element signature="e#831#4664#0" expanded="false" />
-                <element signature="e#3311#4469#0" expanded="false" />
-                <element signature="e#4148#4360#0" expanded="false" />
-                <element signature="e#4753#8327#0" expanded="false" />
-                <element signature="e#6919#8059#0" expanded="false" />
-                <element signature="e#7504#7733#0" expanded="false" />
-                <element signature="e#7753#7959#0" expanded="false" />
-                <element signature="e#8167#8282#0" expanded="false" />
-                <element signature="e#8362#8720#0" expanded="false" />
-                <element signature="e#8451#8463#0" expanded="false" />
-                <element signature="e#8494#8571#0" expanded="false" />
-                <element signature="e#8613#8720#0" expanded="false" />
-                <element signature="e#8776#8957#0" expanded="false" />
-                <element signature="e#9038#9357#0" expanded="false" />
-                <element signature="e#9391#16685#0" expanded="false" />
-                <element signature="e#12100#12117#0" expanded="false" />
-                <element signature="e#12501#12558#0" expanded="false" />
-                <element signature="e#13266#13296#0" expanded="false" />
-                <element signature="e#13717#13747#0" expanded="false" />
-                <element signature="e#14181#14213#0" expanded="false" />
-                <element signature="e#14495#14526#0" expanded="false" />
-                <element signature="e#14641#16530#0" expanded="false" />
-                <element signature="e#14812#14872#0" expanded="false" />
-                <element signature="e#15270#15330#0" expanded="false" />
-                <element signature="e#15732#15792#0" expanded="false" />
-                <element signature="e#16087#16218#0" expanded="false" />
-                <element signature="e#16388#16519#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
-              <caret line="55" column="8" lean-forward="false" selection-start-line="55" selection-start-column="8" selection-end-line="60" selection-end-column="56" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
+                <element signature="e#621#720#0" expanded="false" />
+                <element signature="e#832#5077#0" expanded="false" />
+                <element signature="e#3720#4882#0" expanded="false" />
+                <element signature="e#4561#4773#0" expanded="false" />
+                <element signature="e#5166#9163#0" expanded="false" />
+                <element signature="e#7751#8895#0" expanded="false" />
+                <element signature="e#8340#8569#0" expanded="false" />
+                <element signature="e#8589#8795#0" expanded="false" />
+                <element signature="e#9003#9118#0" expanded="false" />
+                <element signature="e#9198#9556#0" expanded="false" />
+                <element signature="e#9287#9299#0" expanded="false" />
+                <element signature="e#9330#9407#0" expanded="false" />
+                <element signature="e#9449#9556#0" expanded="false" />
+                <element signature="e#9612#9793#0" expanded="false" />
+                <element signature="e#9874#10193#0" expanded="false" />
+                <element signature="e#12936#12953#0" expanded="false" />
+                <element signature="e#13337#13394#0" expanded="false" />
+                <element signature="e#14102#14132#0" expanded="false" />
+                <element signature="e#14554#14584#0" expanded="false" />
+                <element signature="e#15018#15050#0" expanded="false" />
+                <element signature="e#15332#15363#0" expanded="false" />
+                <element signature="e#15478#17367#0" expanded="false" />
+                <element signature="e#15649#15709#0" expanded="false" />
+                <element signature="e#16107#16167#0" expanded="false" />
+                <element signature="e#16569#16629#0" expanded="false" />
+                <element signature="e#16924#17055#0" expanded="false" />
+                <element signature="e#17225#17356#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -120,11 +81,11 @@
       <list>
         <option value="$PROJECT_DIR$/dataset.py" />
         <option value="$PROJECT_DIR$/scripts/plots.py" />
-        <option value="$PROJECT_DIR$/loss.py" />
         <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/models/three_layer_cnn_testing.py" />
         <option value="$PROJECT_DIR$/models/three_layer_cnn_baseline.py" />
         <option value="$PROJECT_DIR$/models/three_layer_cnn_Disc.py" />
+        <option value="$PROJECT_DIR$/loss.py" />
         <option value="$PROJECT_DIR$/GAN_test.py" />
       </list>
     </option>
@@ -135,10 +96,11 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="width" value="638" />
     <option name="height" value="800" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
@@ -154,6 +116,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -170,7 +133,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -296,27 +258,27 @@
     </history-entry>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1280" height="800" extended-state="6" />
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
     <editor active="true" />
     <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19140625" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5062696" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.4937304" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.06171875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32933334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32933334" sideWeight="0.4937304" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
     <layout-to-restore>
@@ -353,17 +315,57 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="9" />
+      <option name="time" value="12" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/loss.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#91#102#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="56" column="8" lean-forward="false" selection-start-line="56" selection-start-column="8" selection-end-line="56" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#12#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/loss.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#91#102#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="840">
+          <caret line="56" column="8" lean-forward="false" selection-start-line="56" selection-start-column="8" selection-end-line="56" selection-end-column="8" />
+          <folding>
+            <element signature="e#0#12#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="13" column="12" lean-forward="false" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#12#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -373,7 +375,7 @@
         <state relative-caret-position="105">
           <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -383,26 +385,16 @@
         <state relative-caret-position="135">
           <caret line="10" column="28" lean-forward="false" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
           <folding>
-            <element signature="e#49#60#0" expanded="true" />
+            <element signature="e#91#102#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py" />
     <entry file="file://$PROJECT_DIR$/scripts/preprocess_lfw_images.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="9" lean-forward="false" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
-          <folding>
-            <element signature="e#105#139#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -410,7 +402,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
           <caret line="8" column="38" lean-forward="false" selection-start-line="8" selection-start-column="38" selection-end-line="8" selection-end-column="38" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -419,7 +410,7 @@
         <state relative-caret-position="195">
           <caret line="13" column="12" lean-forward="false" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#12#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -429,7 +420,7 @@
         <state relative-caret-position="135">
           <caret line="10" column="28" lean-forward="false" selection-start-line="10" selection-start-column="28" selection-end-line="10" selection-end-column="28" />
           <folding>
-            <element signature="e#49#60#0" expanded="true" />
+            <element signature="e#91#102#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -439,26 +430,16 @@
         <state relative-caret-position="30">
           <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py" />
     <entry file="file://$PROJECT_DIR$/scripts/preprocess_lfw_images.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="5" column="9" lean-forward="false" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
-          <folding>
-            <element signature="e#105#139#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -466,23 +447,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
           <caret line="1" column="8" lean-forward="false" selection-start-line="1" selection-start-column="8" selection-end-line="1" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/train.py" />
     <entry file="file://$PROJECT_DIR$/scripts/plots.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="12" lean-forward="false" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -491,76 +463,26 @@
         <state relative-caret-position="30">
           <caret line="7" column="0" lean-forward="false" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
           <folding>
-            <element signature="e#0#31#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/scripts/preprocess_lfw_images_testing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1290">
-          <caret line="89" column="0" lean-forward="false" selection-start-line="89" selection-start-column="0" selection-end-line="89" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Abdel_Madi_Shabneh_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Adam_Scott_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Adrien_Brody_0005.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Aly_Wagner_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Amanda_Marsh_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Andy_Lau_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Andy_Dick_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Andrew_Niccol_0002.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Anders_Fogh_Rasmussen_0003.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Amr_Moussa_0001.jpg">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/scripts/preprocess_lfw_images_testing.py" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Abdel_Madi_Shabneh_0001.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Adam_Scott_0001.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Adrien_Brody_0005.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Aly_Wagner_0001.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Amanda_Marsh_0001.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Andy_Lau_0001.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Andy_Dick_0001.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Andrew_Niccol_0002.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Anders_Fogh_Rasmussen_0003.jpg" />
+    <entry file="file://$PROJECT_DIR$/data/lfw_preprocessed/cropped_rgb/test/Amr_Moussa_0001.jpg" />
     <entry file="file://$PROJECT_DIR$/scripts/preprocess_lfw_images.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
           <caret line="25" column="26" lean-forward="true" selection-start-line="25" selection-start-column="26" selection-end-line="25" selection-end-column="26" />
-          <folding>
-            <element signature="e#105#139#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -568,28 +490,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="8" lean-forward="true" selection-start-line="0" selection-start-column="8" selection-end-line="0" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/models/three_layer_cnn_testing.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="23" column="5" lean-forward="false" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/loss.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="33" column="35" lean-forward="false" selection-start-line="33" selection-start-column="35" selection-end-line="33" selection-end-column="35" />
-          <folding>
-            <element signature="e#49#60#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/models/three_layer_cnn_testing.py" />
     <entry file="file://$PROJECT_DIR$/models/three_layer_cnn_baseline.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -598,60 +502,69 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/models/three_layer_cnn_Disc.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="7" lean-forward="true" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
+          <folding>
+            <element signature="e#0#18#0" expanded="false" />
+            <element signature="e#1003#1087#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/loss.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="508">
+          <caret line="38" column="35" lean-forward="false" selection-start-line="38" selection-start-column="35" selection-end-line="38" selection-end-column="35" />
+          <folding>
+            <element signature="e#91#102#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="55" column="8" lean-forward="false" selection-start-line="55" selection-start-column="8" selection-end-line="60" selection-end-column="56" />
+        <state relative-caret-position="426">
+          <caret line="56" column="8" lean-forward="false" selection-start-line="56" selection-start-column="8" selection-end-line="56" selection-end-column="8" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#12#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/GAN_test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="253" column="26" lean-forward="true" selection-start-line="253" selection-start-column="26" selection-end-line="253" selection-end-column="26" />
+        <state relative-caret-position="195">
+          <caret line="13" column="41" lean-forward="false" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
           <folding>
-            <element signature="e#620#719#0" expanded="false" />
-            <element signature="e#831#4664#0" expanded="false" />
-            <element signature="e#3311#4469#0" expanded="false" />
-            <element signature="e#4148#4360#0" expanded="false" />
-            <element signature="e#4753#8327#0" expanded="false" />
-            <element signature="e#6919#8059#0" expanded="false" />
-            <element signature="e#7504#7733#0" expanded="false" />
-            <element signature="e#7753#7959#0" expanded="false" />
-            <element signature="e#8167#8282#0" expanded="false" />
-            <element signature="e#8362#8720#0" expanded="false" />
-            <element signature="e#8451#8463#0" expanded="false" />
-            <element signature="e#8494#8571#0" expanded="false" />
-            <element signature="e#8613#8720#0" expanded="false" />
-            <element signature="e#8776#8957#0" expanded="false" />
-            <element signature="e#9038#9357#0" expanded="false" />
-            <element signature="e#9391#16685#0" expanded="false" />
-            <element signature="e#12100#12117#0" expanded="false" />
-            <element signature="e#12501#12558#0" expanded="false" />
-            <element signature="e#13266#13296#0" expanded="false" />
-            <element signature="e#13717#13747#0" expanded="false" />
-            <element signature="e#14181#14213#0" expanded="false" />
-            <element signature="e#14495#14526#0" expanded="false" />
-            <element signature="e#14641#16530#0" expanded="false" />
-            <element signature="e#14812#14872#0" expanded="false" />
-            <element signature="e#15270#15330#0" expanded="false" />
-            <element signature="e#15732#15792#0" expanded="false" />
-            <element signature="e#16087#16218#0" expanded="false" />
-            <element signature="e#16388#16519#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/models/three_layer_cnn_Disc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="7" lean-forward="true" selection-start-line="10" selection-start-column="7" selection-end-line="10" selection-end-column="7" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <element signature="e#1003#1087#0" expanded="false" />
+            <element signature="e#621#720#0" expanded="false" />
+            <element signature="e#832#5077#0" expanded="false" />
+            <element signature="e#3720#4882#0" expanded="false" />
+            <element signature="e#4561#4773#0" expanded="false" />
+            <element signature="e#5166#9163#0" expanded="false" />
+            <element signature="e#7751#8895#0" expanded="false" />
+            <element signature="e#8340#8569#0" expanded="false" />
+            <element signature="e#8589#8795#0" expanded="false" />
+            <element signature="e#9003#9118#0" expanded="false" />
+            <element signature="e#9198#9556#0" expanded="false" />
+            <element signature="e#9287#9299#0" expanded="false" />
+            <element signature="e#9330#9407#0" expanded="false" />
+            <element signature="e#9449#9556#0" expanded="false" />
+            <element signature="e#9612#9793#0" expanded="false" />
+            <element signature="e#9874#10193#0" expanded="false" />
+            <element signature="e#12936#12953#0" expanded="false" />
+            <element signature="e#13337#13394#0" expanded="false" />
+            <element signature="e#14102#14132#0" expanded="false" />
+            <element signature="e#14554#14584#0" expanded="false" />
+            <element signature="e#15018#15050#0" expanded="false" />
+            <element signature="e#15332#15363#0" expanded="false" />
+            <element signature="e#15478#17367#0" expanded="false" />
+            <element signature="e#15649#15709#0" expanded="false" />
+            <element signature="e#16107#16167#0" expanded="false" />
+            <element signature="e#16569#16629#0" expanded="false" />
+            <element signature="e#16924#17055#0" expanded="false" />
+            <element signature="e#17225#17356#0" expanded="false" />
           </folding>
         </state>
       </provider>
