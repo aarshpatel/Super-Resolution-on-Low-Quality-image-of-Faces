@@ -40,20 +40,10 @@ def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
         i += 1
     return model
 
-def perceptual_loss(pred, target):
-	vgg16 = models.vgg16(pretrained=True).features
-	vgg16.cuda()
+# def perceptual_loss(pred, target, vgg_loss, loss_fn):
+# 	inp = vgg_loss(pred.cuda())
+# 	tar = vgg_loss(target.cuda())
 
-	# sequential model
-	vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
+# 	loss = loss_fn(inp, tar)
 
-	for param in vgg_loss.parameters():
-		param.requires_grad = False
-
-	inp = vgg_loss(pred.cuda())
-	tar = vgg_loss(target.cuda())
-
-	lossFunction = nn.MSELoss(size_average=False)
-	loss = lossFunction(inp, tar)
-
-	return loss
+# 	return loss
