@@ -12,16 +12,13 @@ from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
-
     def __init__(self):
         self.reset()
-
     def reset(self):
         self.val = 0
         self.avg = 0
         self.sum = 0
         self.count = 0
-
     def update(self, val, n=1):
         self.val = val
         self.sum += val * n
@@ -56,6 +53,7 @@ def evaluate_on_test(model, test_loader, metrics):
 			psnr = calc_psnr(mse.data[0])
 			psnr_meter.update(psnr, input.size(0))
 		elif "ssim" in metrics:
+			print("calc ssim")
 			ssim = calc_ssim(output.data.float(), target.data.float())
 			ssim_meter.update(ssim, input.size(0))
 
@@ -71,7 +69,6 @@ if __name__ == "__main__":
 	parser.add_argument('--cuda', action='store_true', help='use cuda?')
 		
 	opt = parser.parse_args()
-
 	model_name = opt.model
 
 
@@ -85,10 +82,6 @@ if __name__ == "__main__":
 	method = model_name_split_parameters[1].split("=")[1]
 	size = int(model_name_split_parameters[2].split("=")[1])
 	model = model_name_split_parameters[0]
-
-	print(method)
-	print(size)
-	print(model)
 
 	if grayscale:
 		image_color = "grayscale"
@@ -127,6 +120,6 @@ if __name__ == "__main__":
 	psnr_test_avg, ssim_test_avg = evaluate_on_test(model, test_loader, metrics)
 
 	if "psnr" in metrics:
-		print("PSNR AVG: ", psnr_test_avg)
+		print "PSNR AVG: ", psnr_test_avg
 	elif "ssim" in metrics:
-		print("SSIM AVG: ", ssim_test_avg)
+		print "SSIM AVG: ", ssim_test_avg
