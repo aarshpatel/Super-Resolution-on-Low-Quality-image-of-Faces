@@ -52,7 +52,7 @@ def evaluate_on_test(model, test_loader, metric):
 			psnr = calc_psnr(mse.data[0])
 			metric_meter.update(psnr, input.size(0))
 		elif "ssim" == metric:
-			ssim = calc_ssim(output.data.float(), target.data.float())
+			ssim = calc_ssim(output.data.float().numpy(), target.data.float().numpy())
 			metric_meter.update(ssim, input.size(0))
 
 	return metric_meter.avg 
