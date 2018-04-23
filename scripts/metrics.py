@@ -3,12 +3,12 @@
 import numpy as np
 import math
 from skimage.measure import compare_psnr, compare_ssim
-
-def psnr(img1, img2):
-    """ Compute the Peak Signal Noise Ratio between two images (PSNR) """
-    return compare_psnr(img1, img2)
+from math import log10
 
 def ssim(img1, img2):
     """ Compute the structural similarity between two images (SSIM) """
     return compare_ssim(img1, img2, multichannel=True)
 
+def calc_psnr(mse):
+	"""Calculate the psnr (Peak Signal Noise Ratio)"""
+	return (20.0 * log10(255.0)) - (10.0 * log10(mse))

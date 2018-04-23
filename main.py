@@ -15,7 +15,7 @@ import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
-from scripts.metrics import psnr, ssim
+from scripts.metrics import calc_psnr
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
 from torchvision import models
@@ -156,13 +156,6 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss):
 
 	return losses_meter.avg, psnr_meter.avg
 
-
-def calc_psnr(mse):
-	"""Calculate the psnr (Peak Signal Noise Ratio)"""
-	# rmse = np.sqrt(mse)
-	# return 20 * log10(1.0 / rmse)
-	return (20 * log10(255.0)) - (10 * log10(mse))
-    
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""

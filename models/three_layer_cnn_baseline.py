@@ -2,15 +2,13 @@ import torch
 import torchvision
 import torch.nn as nn
 from conv_block import ConvBlock 
-
 import torch
 import torchvision
 import torch.nn as nn
 
 class ThreeLayerCNNBasline(nn.Module):
     """ 
-    Simple three layer baseline that uses padding to perseve the spatial size 
-    This is similar to the SRCNN model that was presented here:  https://arxiv.org/pdf/1501.00092.pdf
+    Simple three layer baseline that uses Conv Tranpose to upscale the image to the input image size 
     """
 
     def __init__(self, batchnorm=False):
@@ -28,8 +26,8 @@ class ThreeLayerCNNBasline(nn.Module):
             nn.Conv2d(D_in, D_mid, kernel_size=(5,5), stride=(1,1), padding=(2,2)),
             nn.BatchNorm2d(D_mid),
             nn.ReLU(),
-            nn.ConvTranspose2d(D_mid, D_out,kernel_size=(2,2), stride=(2,2)),
-            nn.Tanh()
+            nn.ConvTranspose2d(D_mid, D_out,kernel_size=(2,2), stride=(2,2))
+            # nn.Tanh()
         )
 
     def forward(self,x):
