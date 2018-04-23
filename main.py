@@ -17,7 +17,6 @@ from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
 from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
-from loss import perceptual_loss
 from loss import create_loss_model
 from torchvision import models
 
