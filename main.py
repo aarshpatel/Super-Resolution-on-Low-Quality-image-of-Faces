@@ -47,8 +47,8 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 
 		# calculate the loss (pixel or perceptual)
 		if loss_type == "perceptual":
-			vgg_loss_input = vgg_loss(output.cuda())
-			vgg_loss_target = vgg_loss(target.cuda())
+			vgg_loss_input = vgg_loss(output)
+			vgg_loss_target = vgg_loss(target)
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
 			mse = loss_fn(output, target)
 		else:
@@ -127,12 +127,11 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss):
 			vgg_loss_input = vgg_loss(output.cuda())
 			vgg_loss_target = vgg_loss(target.cuda())
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
-			mse = loss_fn(output, target)
 		else:
 			loss = loss_fn(output, target)
-			mse = loss
 
 		# compute the psnr and loss on the validation set
+		mse = loss_fn(output , target)
 		psnr = calc_psnr(mse.data[0])
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
@@ -235,7 +234,7 @@ if __name__ == "__main__":
     main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
                                                                                                       opt.method,
                                                                                                       opt.size,
-                                                                                                      opt.loss, opt.lr,
+                                                                                                      opt.loss_type, opt.lr,
                                                                                                       opt.epochs,
                                                                                                       opt.batch_size)
 
