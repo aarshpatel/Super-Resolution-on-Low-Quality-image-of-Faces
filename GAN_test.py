@@ -12,7 +12,7 @@ import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
-from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
+from models.generative_cnn_test import ThreeLayerCNNGen
 from models.three_layer_cnn_Disc import ThreeLayerCNNDisc
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
@@ -337,7 +337,7 @@ if __name__ == "__main__":
     # ============================
 
     # get the model Generative
-    modelG = ThreeLayerCNNBaseline()
+    modelG = ThreeLayerCNNGen()
 
     # set the optimizer Generative
     optimizerG = optim.Adam(modelG.parameters(), lr=lr, weight_decay=weight_decay)
