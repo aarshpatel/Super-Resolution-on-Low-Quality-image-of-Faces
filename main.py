@@ -69,7 +69,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name
 		batch_time_meter.update(time.time() - start)
 		start = time.time()
 
-		if iteration % 100 == 0:
+		if iteration % 500 == 0:
 			
 			new_output_dir = "./images_from_runs/{0}/train/".format(model_name)
 
@@ -138,7 +138,7 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 		batch_time_meter.update(time.time() - start)
 		start = time.time()
 
-		if iteration % 100 == 0:
+		if iteration % 500 == 0:
 			
 			new_output_dir = "./images_from_runs/{0}/val/".format(model_name)
 
@@ -188,12 +188,11 @@ class AverageMeter(object):
         self.avg = self.sum / self.count
 
 def save_image(input, output, target, filename):
-	""" Save the input, output, target image during training"""
+	""" Save the input, output, target image during training """
 	all_images = torch.cat((input, output, target))
 	vutils.save_image(all_images, filename=filename, normalize=True)
 
 def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
-	
     """Saves model checkpoint to disk"""
     directory = "saved_models/%s/" % (name)
     if not os.path.exists(directory):
@@ -206,8 +205,7 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-    parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline",
-                        help="type of model to use for facial reconstruction")
+    parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
     parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
     parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
     parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
