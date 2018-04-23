@@ -1,9 +1,3 @@
-import torch
-import torchvision
-import torch.nn as nn
-from conv_block import ConvBlock 
-import torch
-import torchvision
 import torch.nn as nn
 
 class ThreeLayerCNNBasline(nn.Module):
@@ -27,7 +21,6 @@ class ThreeLayerCNNBasline(nn.Module):
             nn.BatchNorm2d(D_mid),
             nn.ReLU(),
             nn.ConvTranspose2d(D_mid, D_out,kernel_size=(2,2), stride=(2,2))
-            # nn.Tanh()
         )
 
     def forward(self,x):
