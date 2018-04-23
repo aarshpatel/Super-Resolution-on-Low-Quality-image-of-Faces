@@ -16,6 +16,7 @@ from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
 from scripts.metrics import calc_psnr
+from scripts.average_meter import AverageMeter
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
 from torchvision import models
@@ -167,24 +168,6 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 		writer.add_scalar("Loss/val", losses_meter.avg, epoch)
 
 	return losses_meter.avg, psnr_meter.avg
-
-class AverageMeter(object):
-    """Computes and stores the average and current value"""
-
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
 
 def save_image(input, output, target, filename):
 	""" Save the input, output, target image during training """

@@ -8,22 +8,8 @@ import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
 from scripts.metrics import calc_psnr, calc_ssim
+from scripts.average_meter import AverageMeter
 from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
-
-class AverageMeter(object):
-    """Computes and stores the average and current value"""
-    def __init__(self):
-        self.reset()
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
 	
 def evaluate_on_test(model, test_loader, metric):
 	""" Evaluate the trained model on the test data using some specified metric """
