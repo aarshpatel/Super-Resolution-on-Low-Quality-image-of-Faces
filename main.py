@@ -32,56 +32,59 @@ def train(train_loader, model, criterion, optimizer, epoch):
 	
 	start = time.time()
 	for iteration, batch in enumerate(train_loader, 1):
-			input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
+		input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
 
-			# use the GPU
-			if use_cuda:
-			    input = input.cuda()
-			    target = target.cuda()
+		# use the GPU
+		if use_cuda:
+			input = input.cuda()
+			target = target.cuda()
 
-			# compute output from CNN model
-			output = model(input)
-			loss = criterion(output, target)
+		# compute output from CNN model
+		output = model(input)
+		loss = criterion(output, target)
 
-			# measure psnr and loss
-			psnr = calc_psnr(loss.data[0])
-			psnr_meter.update(psnr, input.size(0))
-			losses_meter.update(loss.data[0], input.size(0))
+		print("Iteration: ", iteration)
+		print("Perceptual Loss: ", loss.data[0])
 
-			# zero out the gradients
-			optimizer.zero_grad()
-			loss.backward()
-			optimizer.step()
+		# measure psnr and loss
+		psnr = calc_psnr(loss.data[0])
+		psnr_meter.update(psnr, input.size(0))
+		losses_meter.update(loss.data[0], input.size(0))
 
-			# measure the time it takes to train for one epoch
-			batch_time_meter.update(time.time() - start)			
-			start = time.time()
+		# zero out the gradients
+		optimizer.zero_grad()
+		loss.backward()
+		optimizer.step()
 
-			if iteration % 100 == 0:
+		# measure the time it takes to train for one epoch
+		batch_time_meter.update(time.time() - start)			
+		start = time.time()
 
-				model_output_image = output.data
-				model_input_image = input.data.float()
-				model_target_image = target.data.float()
+		if iteration % 100 == 0:
 
-				all_images = torch.cat((model_input_image, model_output_image, model_target_image))
+			model_output_image = output.data
+			model_input_image = input.data.float()
+			model_target_image = target.data.float()
 
-				if opt.tensorboard:
+			all_images = torch.cat((model_input_image, model_output_image, model_target_image))
 
-					all_images_grid = vutils.make_grid(all_images, normalize=True)
+			if opt.tensorboard:
 
-					writer.add_image('Image Reconstruction', all_images_grid, epoch*iteration)
-					
-				if opt.save_img:					
-					save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
-					vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
-					
-					
-				print('Epoch: [{0}][{1}/{2}]\t'
-					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-					'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(
-						epoch, iteration, len(train_loader), batch_time=batch_time_meter,
-						loss=losses_meter, psnr=psnr_meter))
+				all_images_grid = vutils.make_grid(all_images, normalize=True)
+
+				writer.add_image('Image Reconstruction', all_images_grid, epoch*iteration)
+				
+			if opt.save_img:					
+				save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
+				vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
+				
+				
+			print('Epoch: [{0}][{1}/{2}]\t'
+				'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+				'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+				'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(
+					epoch, iteration, len(train_loader), batch_time=batch_time_meter,
+					loss=losses_meter, psnr=psnr_meter))
 
 	# log value to tensorboard or visdom
 	if opt.tensorboard:
