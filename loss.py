@@ -45,7 +45,9 @@ def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
 
 def perceptual_loss(pred, target):
 	vgg16 = models.vgg16(pretrained=True).features
-		
+	vgg16.cuda()
+
+	# sequential model
 	vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
 
 	for param in vgg_loss.parameters():
