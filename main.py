@@ -138,7 +138,7 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 		batch_time_meter.update(time.time() - start)
 		start = time.time()
 
-		if iteration % 500 == 0:
+		if iteration % 100 == 0:
 			
 			new_output_dir = "./images_from_runs/{0}/val/".format(model_name)
 
