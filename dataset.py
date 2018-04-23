@@ -14,9 +14,6 @@ class ObfuscatedDatasetLoader(data.Dataset):
 		"""
 		super(ObfuscatedDatasetLoader, self).__init__()
 
-		# get the training and test labels 
-		# training - obfuscated images (either blurred or pixelated images)
-		# testing - orginal grayscale image
 		def get_dataset():
 			""" Get all of the obfuscated images for a particular method and size """
 			x_train = []
@@ -45,8 +42,9 @@ class ObfuscatedDatasetLoader(data.Dataset):
 			x_train = np.array(x_train)
 			y_train = np.array(y_train)
 
-			print("X train: ", x_train.shape)
-			print("Y train: ", y_train.shape)
+			print("Dataset Type: ", data_type)
+			print(x_train.shape)
+			print(y_train.shape)
 
 			return x_train, y_train
 

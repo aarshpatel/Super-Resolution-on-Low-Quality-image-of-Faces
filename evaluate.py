@@ -80,10 +80,9 @@ if __name__ == "__main__":
 	metrics = opt.metrics
 	num_workers = opt.threads
 	use_cuda = opt.cuda
-
-	print(model_name.split("/"))
 	
-	model_name_split_parameters = model_name.split("_")
+	model_name_split_parameters = model_name.split("/")[2].split("=")
+	print(model_name_split_parameters)
 	method = model_name_split_parameters[2]
 	size = int(model_name_split_parameters[3])
 	model = model_name_split_parameters[1].split("/")[1]

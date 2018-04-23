@@ -1,4 +1,9 @@
-""" Implementation of multiple loss fuctions """
+""" 
+Implementation of multiple loss fuctions 
+1) Perceptual Loss
+2) Adverserial Loss
+"""
+
 import copy
 import torch
 import torch.nn as nn
