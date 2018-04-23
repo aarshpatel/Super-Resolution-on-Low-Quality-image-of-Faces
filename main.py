@@ -93,8 +93,8 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name
 
 	# log value to tensorboard or visdom
 	if opt.tensorboard:
-		writer.add_scalar("PSNR/Train", psnr_meter.avg, epoch)
-		writer.add_scalar("Loss/Train", losses_meter.avg, epoch)
+		train_writer.add_scalar("PSNR", psnr_meter.avg, epoch)
+		train_writer.add_scalar("Loss", losses_meter.avg, epoch)
 
 
 def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
@@ -107,7 +107,8 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 	model.eval()
 
 	start = time.time() 	
-	loss_fn = nn.MSELoss()
+
+	loss_fn = nn.MSELoss().cuda()
 
 	for iteration, batch in enumerate(val_loader, start=1):
 		input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
@@ -163,8 +164,8 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 	print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
 
 	if opt.tensorboard:
-		writer.add_scalar("PSNR/Val", psnr_meter.avg, epoch)
-		writer.add_scalar("Loss/Val", losses_meter.avg, epoch)
+		val_writer.add_scalar("PSNR", psnr_meter.avg, epoch)
+		val_writer.add_scalar("Loss", losses_meter.avg, epoch)
 
 	return losses_meter.avg, psnr_meter.avg
 
@@ -204,28 +205,30 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-    parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
-    parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
-    parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
-    parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
-    parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
-    parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
-    parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
-    parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
-    parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
-    parser.add_argument('--weight-decay', type=float, default=1e-4, help="weight decay applied to the optimizer")
-    parser.add_argument('--cuda', action='store_true', help='use cuda?')
-    parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
-    parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
-    parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
-    parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
-    global opt, writer, best_avg_psnr
-    opt = parser.parse_args()
+	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
+	parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
+	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
+	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
+	parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
+	parser.add_argument("--loss", type=str, default="mse", help="type of loss function to use (eg. mse, perceptual)")
+	parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
+	parser.add_argument('--test_batch_size', type=int, default=10, help='testing batch size')
+	parser.add_argument('--epochs', type=int, default=2, help='number of epochs to train for')
+	parser.add_argument('--lr', type=float, default=0.01, help='Learning Rate. Default=0.01')
+	parser.add_argument('--weight-decay', type=float, default=1e-4, help="weight decay applied to the optimizer")
+	parser.add_argument('--cuda', action='store_true', help='use cuda?')
+	parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
+	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
+	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
+	parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
+	global opt, writer, best_avg_psnr
+	opt = parser.parse_args()
 
-    # setup the tensorboard
-    writer = SummaryWriter("./runs/")
+	# setup the tensorboard
+	train_writer = SummaryWriter("./runs/") 
+	val_writer = SummaryWriter("./runs/")
 
+	
     best_avg_psnr = 0
 
     # get the arguments from argparse
