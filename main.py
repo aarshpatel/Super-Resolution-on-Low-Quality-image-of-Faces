@@ -136,7 +136,7 @@ def validate(val_loader, model, criterion, epoch):
 
 def calc_psnr(mse):
 	"""Calculate the psnr (Peak Signal Noise Ratio)"""
-	return 20 * log10(1.0/np.sqrt(mse))	
+	return 20 * log10(255.0/np.sqrt(mse))	
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
