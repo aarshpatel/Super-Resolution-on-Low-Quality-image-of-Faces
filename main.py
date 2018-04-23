@@ -31,7 +31,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 	model.train()
 
 	# setup the loss function (MSE)
-	loss_fn = nn.MSELoss(size_average=False)
+	loss_fn = nn.MSELoss()
 
 	start = time.time()
 	for iteration, batch in enumerate(train_loader, 1):
@@ -50,11 +50,13 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 			vgg_loss_input = vgg_loss(output.cuda())
 			vgg_loss_target = vgg_loss(target.cuda())
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
+			mse = loss_fn(output, target)
 		else:
 			loss = loss_fn(output, target)
+			mse = loss
 
 		# measure psnr and loss
-		psnr = calc_psnr(loss.data[0])
+		psnr = calc_psnr(mse.data[0])
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
