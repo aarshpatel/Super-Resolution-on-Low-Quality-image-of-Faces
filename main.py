@@ -96,7 +96,6 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name
 		writer.add_scalar("PSNR/train ", psnr_meter.avg, epoch)
 		writer.add_scalar("Loss/train", losses_meter.avg, epoch)
 
-
 def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
@@ -168,7 +167,6 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 		writer.add_scalar("Loss/val", losses_meter.avg, epoch)
 
 	return losses_meter.avg, psnr_meter.avg
-
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""

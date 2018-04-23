@@ -5,7 +5,7 @@ import math
 from skimage.measure import compare_psnr, compare_ssim
 from math import log10
 
-def ssim(img1, img2):
+def calc_ssim(img1, img2):
     """ Compute the structural similarity between two images (SSIM) """
     return compare_ssim(img1, img2, multichannel=True)
 
