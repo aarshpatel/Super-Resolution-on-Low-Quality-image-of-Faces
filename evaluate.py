@@ -25,13 +25,10 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 	
-def evaluate_on_test(model, test_loader, metrics):
+def evaluate_on_test(model, test_loader, metric):
 	""" Evaluate the trained model on the test data using some specified metric """
 
-	print("Metrics: ", metrics)
-
-	psnr_meter = AverageMeter()
-	ssim_meter = AverageMeter()
+	metric_meter = AverageMeter()
 
 	# switch to eval mode
 	model.eval()
@@ -50,16 +47,15 @@ def evaluate_on_test(model, test_loader, metrics):
 		output = model(input)
 
 		# compute the psnr and ssim on the test set
-		if "psnr" in metrics:
+		if "psnr" == metric:
 			mse = loss_fn(output, target)
 			psnr = calc_psnr(mse.data[0])
-			psnr_meter.update(psnr, input.size(0))
-		elif "ssim" in metrics:
-			print("calc ssim")
+			metric_meter.update(psnr, input.size(0))
+		elif "ssim" == metric:
 			ssim = calc_ssim(output.data.float(), target.data.float())
-			ssim_meter.update(ssim, input.size(0))
+			metric_meter.update(ssim, input.size(0))
 
-	return psnr_meter.avg, ssim_meter.avg
+	return metric_meter.avg 
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Evaluation script to test performance of the model on the testing data')
@@ -119,9 +115,11 @@ if __name__ == "__main__":
 	model.cuda()
 
 	# evaluate the model on the test data
-	psnr_test_avg, ssim_test_avg = evaluate_on_test(model, test_loader, metrics)
+	for metric in metrics:
 
-	if "psnr" in metrics:
-		print "PSNR AVG: ", psnr_test_avg
-	elif "ssim" in metrics:
-		print "SSIM AVG: ", ssim_test_avg
+		metric_avg = evaluate_on_test(model, test_loader, metric)
+
+		if metric == "psnr":
+			print "PSNR Avg: ", metric_avg
+		elif metric == "ssim":
+			print "SSIM Avg: ", metric_avg
