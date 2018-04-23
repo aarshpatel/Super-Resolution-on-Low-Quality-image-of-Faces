@@ -234,7 +234,7 @@ if __name__ == "__main__":
     main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
                                                                                                       opt.method,
                                                                                                       opt.size,
-                                                                                                      opt.loss_type, opt.lr,
+                                                                                                      opt.loss, opt.lr,
                                                                                                       opt.epochs,
                                                                                                       opt.batch_size)
 
