@@ -73,6 +73,9 @@ if __name__ == "__main__":
 	opt = parser.parse_args()
 
 	model_name = opt.model
+
+	print("model:", model_name)
+
 	grayscale = opt.grayscale
 	batch_size = opt.batch_size
 	metrics = opt.metrics
