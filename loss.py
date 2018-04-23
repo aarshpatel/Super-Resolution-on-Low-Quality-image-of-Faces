@@ -5,8 +5,6 @@ import torch.nn as nn
 from torchvision import models
 import torch.nn.functional as F
 
-
-
 def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
     """
         [1] uses the output of vgg16 relu2_2 layer as a loss function (layer8 on PyTorch default vgg16 model).
@@ -19,7 +17,7 @@ def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
     model = nn.Sequential()
 
     if use_cuda:
-        model.cuda(device_id=0)
+        model.cuda()
 
     i = 0
     for layer in list(vgg):
@@ -45,16 +43,18 @@ def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
         i += 1
     return model
 
-def pixel_loss(input, target, norm_constant):
-    """ Pixel loss => normalized euclidean distance between the output image and the target """
-    return torch.div(torch.sum((input - target) ** 2), norm_constant)
+def perceptual_loss(pred, target):
+	vgg16 = models.vgg16(pretrained=True).features
+		
+	vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
 
+	for param in vgg_loss.parameters():
+		param.requires_grad = False
 
-def perceptual_loss(input, target):
-    vgg16 = models.vgg16(pretrained=True).features
-    vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
-    inp = vgg_loss(input)
-    tar = vgg_loss(target)
-    lossFunction = nn.MSELoss(size_average=False)
-    loss = lossFunction(tar, inp)
-    return loss
+	inp = vgg_loss(pred)
+	tar = vgg_loss(target)
+
+	lossFunction = nn.MSELoss(size_average=False)
+	loss = lossFunction(tar, inp)
+
+	return loss

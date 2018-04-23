@@ -17,7 +17,7 @@ from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
 from scripts.metrics import psnr, ssim
 from scripts.plots import plot_training_loss, plot_train_val_psnr
-from loss import pixel_loss
+from loss import perceptual_loss
 
 
 def train(train_loader, model, criterion, optimizer, epoch):
@@ -235,10 +235,6 @@ if __name__ == "__main__":
 	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="val", transform=transform_normalize)
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
-	# get the test set
-	# test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_grayscale/", method, size, "test")
-	# test_loader = DataLoader(test_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
-
 	# get the model
 	model = ThreeLayerCNNBasline()
 
@@ -248,6 +244,7 @@ if __name__ == "__main__":
 		else:        criterion = nn.MSELoss()
 	elif loss == "perceptual":
 		print("loading the perceptual loss")
+		criterion = perceptual_loss
 
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(),lr=lr, weight_decay=weight_decay)
