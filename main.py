@@ -100,17 +100,18 @@ def train(train_loader, model, loss, optimizer, epoch, vgg_loss):
 
 
 def validate(val_loader, model, loss, epoch, vgg_loss):
-    """ Validate the model on the validation set """
-    batch_time_meter = AverageMeter()
-    losses_meter = AverageMeter()
-    psnr_meter = AverageMeter()
+	""" Validate the model on the validation set """
+	batch_time_meter = AverageMeter()
+	losses_meter = AverageMeter()
+	psnr_meter = AverageMeter()
 
-    # switch to eval mode
-    model.eval()
+	# switch to eval mode
+	model.eval()
 
-    start = time.time()
+	start = time.time() 	
+	loss_fn = nn.MSELoss(size_average=False)
 
-    for iteration, batch in enumerate(val_loader, start=1):
+	for iteration, batch in enumerate(val_loader, start=1):
 		input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
 
 		# use the GPU
@@ -146,13 +147,13 @@ def validate(val_loader, model, loss, epoch, vgg_loss):
 				iteration, len(val_loader), batch_time=batch_time_meter, loss=losses_meter,
 				psnr=psnr_meter))
 
-    print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
+	print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
 
-    if opt.tensorboard:
-        writer.add_scalar("PSNR/Val", psnr_meter.avg, epoch)
-        writer.add_scalar("Loss/Val", losses_meter.avg, epoch)
+	if opt.tensorboard:
+		writer.add_scalar("PSNR/Val", psnr_meter.avg, epoch)
+		writer.add_scalar("Loss/Val", losses_meter.avg, epoch)
 
-    return losses_meter.avg, psnr_meter.avg
+return losses_meter.avg, psnr_meter.avg
 
 
 def calc_psnr(mse):

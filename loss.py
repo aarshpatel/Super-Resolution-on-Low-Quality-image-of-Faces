@@ -39,11 +39,3 @@ def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
                 model.add_module(name, avgpool)
         i += 1
     return model
-
-# def perceptual_loss(pred, target, vgg_loss, loss_fn):
-# 	inp = vgg_loss(pred.cuda())
-# 	tar = vgg_loss(target.cuda())
-
-# 	loss = loss_fn(inp, tar)
-
-# 	return loss
