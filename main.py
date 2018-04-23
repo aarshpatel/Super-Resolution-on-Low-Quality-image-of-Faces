@@ -66,6 +66,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
 				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
 				vis_image = torch.cat((model_input_image, model_target_image))
 
+				all_images = torch.cat((model_input_image, model_output_image, model_target_image))
+
 				if opt.tensorboard:
 
 					x = vutils.make_grid(vis_image, normalize=True)
@@ -76,9 +78,9 @@ def train(train_loader, model, criterion, optimizer, epoch):
 					
 				if opt.save_img:					
 					save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
-					save_img_input_target_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_gt.jpg".format(epoch, iteration)
-					vutils.save_image(model_output_image, filename=save_img_output_filename, normalize=True)
-					vutils.save_image(vis_image, filename=save_img_input_target_filename, normalize=True)
+					# save_img_input_target_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_gt.jpg".format(epoch, iteration)
+					vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
+					# vutils.save_image(vis_image, filename=save_img_input_target_filename, normalize=True)
 					
 					
 				print('Epoch: [{0}][{1}/{2}]\t'
