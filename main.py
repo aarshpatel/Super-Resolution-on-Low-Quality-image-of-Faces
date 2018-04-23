@@ -74,7 +74,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
 					writer.add_image('Input-Image', x, epoch*iteration)
 					writer.add_image('Reconsructed-Image', y, epoch*iteration)
 					
-				if opt.save_img_on_runs:					
+				if opt.save_img:					
 					save_img_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter.jpg".format(epoch, iteration)
 					vutils.save_image(model_output_image, filename=save_img_filename)
 					
@@ -185,7 +185,7 @@ if __name__ == "__main__":
 	parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
 	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
 	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
-	parser.add_argument('--save_img_on_runs', actions="store_true", help="save the output images when training the model")
+	parser.add_argument('--save_img', actions="store_true", help="save the output images when training the model")
 	global opt, writer, best_avg_psnr
 	opt = parser.parse_args()
 
