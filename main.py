@@ -59,18 +59,19 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
 			if iteration % 100 == 0:
 
-				model_output_image = output.data
-				model_input_image = input.data.float()
-				model_target_image = target.data.float()
+				if opt.tensorboard:
+					model_output_image = output.data
+					model_input_image = input.data.float()
+					model_target_image = target.data.float()
 
-				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
-				vis_image = torch.cat((model_input_image, model_target_image))
+					# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
+					vis_image = torch.cat((model_input_image, model_target_image))
 
-				x = vutils.make_grid(vis_image, normalize=True)
-				y = vutils.make_grid(model_output_image, normalize=True)
+					x = vutils.make_grid(vis_image, normalize=True)
+					y = vutils.make_grid(model_output_image, normalize=True)
 
-				writer.add_image('Input-Image', x, epoch*iteration)
-				writer.add_image('Reconsructed-Image', y, epoch*iteration)
+					writer.add_image('Input-Image', x, epoch*iteration)
+					writer.add_image('Reconsructed-Image', y, epoch*iteration)
 					
 
 				print('Epoch: [{0}][{1}/{2}]\t'
