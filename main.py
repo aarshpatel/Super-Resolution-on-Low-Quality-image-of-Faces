@@ -71,7 +71,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 
 		if iteration % 100 == 0:
 
-			model_output_image = output.data
+			model_output_image = output.data.float()
 			model_input_image = input.data.float()
 			model_target_image = target.data.float()
 
@@ -83,9 +83,8 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 				writer.add_image('Image Reconstruction', all_images_grid, epoch * iteration)
 
 			if opt.save_img:
-				save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch,
-																											iteration)
-				vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
+				save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
+				vutils.save_image(all_images, filename=save_img_output_filename)
 
 			print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
