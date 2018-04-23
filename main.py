@@ -229,95 +229,94 @@ if __name__ == "__main__":
 	val_writer = SummaryWriter("./runs/")
 
 	
-    best_avg_psnr = 0
+	best_avg_psnr = 0
 
-    # get the arguments from argparse
-    num_epochs = opt.epochs
-    lr = opt.lr
-    method = opt.method
-    size = opt.size
-    batch_size = opt.batch_size
-    use_cuda = opt.cuda
-    loss_type = opt.loss
-    num_workers = opt.threads
-    weight_decay = opt.weight_decay
-    grayscale = opt.grayscale
+	# get the arguments from argparse
+	num_epochs = opt.epochs
+	lr = opt.lr
+	method = opt.method
+	size = opt.size
+	batch_size = opt.batch_size
+	use_cuda = opt.cuda
+	loss_type = opt.loss
+	num_workers = opt.threads
+	weight_decay = opt.weight_decay
+	grayscale = opt.grayscale
 
-    main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
-                                                                                                      opt.method,
-                                                                                                      opt.size,
-                                                                                                      opt.loss, opt.lr,
-                                                                                                      opt.epochs,
-                                                                                                      opt.batch_size)
+	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
+																										opt.method,
+																										opt.size,
+																										opt.loss, opt.lr,
+																										opt.epochs,
+																										opt.batch_size)
+	print("Hyperparameters: ", main_hyperparameters)
 
-    print("Hyperparameters: ", main_hyperparameters)
+	if grayscale:
+		image_color = "grayscale"
+	else:
+		image_color = "rgb"
 
-    if grayscale:
-        image_color = "grayscale"
-    else:
-        image_color = "rgb"
+	#################
+	# Normalization #
+	#################
+	train_mean = np.array([149.59638197, 114.21029544,  93.41318133])
+	train_std = np.array([52.54902009, 44.34252746, 42.88273568])
+	normalize = transforms.Normalize(mean=[mean/255.0 for mean in train_mean],
+										std=[std/255.0 for std in train_std])
 
-    #################
-    # Normalization #
-    #################
-    train_mean = np.array([149.59638197, 114.21029544,  93.41318133])
-    train_std = np.array([52.54902009, 44.34252746, 42.88273568])
-    normalize = transforms.Normalize(mean=[mean/255.0 for mean in train_mean],
-                                     std=[std/255.0 for std in train_std])
+	transform_normalize = transforms.Compose([
+		transforms.ToTensor(),
+		normalize,
+	])
 
-    transform_normalize = transforms.Compose([
-        transforms.ToTensor(),
-        normalize,
-    ])
+	# get the training data
+	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size,
+											grayscale=False, data_type="train", transform=transform_normalize)
+	train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
-    # get the training data
-    train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size,
-                                         grayscale=False, data_type="train", transform=transform_normalize)
-    train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+	# get the validation set
+	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size,
+										grayscale=False, data_type="val", transform=transform_normalize)
+	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
-    # get the validation set
-    val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size,
-                                       grayscale=False, data_type="val", transform=transform_normalize)
-    val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
+	# get the model
+	model = ThreeLayerCNNBasline()
 
-    # get the model
-    model = ThreeLayerCNNBasline()
+	# set the optimizer
+	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-    # set the optimizer
-    optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+	# set the scheduler
+	scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", patience=5)
 
-    # set the scheduler
-    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", patience=5)
-
-    if use_cuda:
-        model = model.cuda()
+	if use_cuda:
+		model = model.cuda()
 
 	# Setup the VGG for Perceptual Loss
 	vgg16 = models.vgg16(pretrained=True).features
-    vgg16.cuda()
-    vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
+	vgg16.cuda()
+	vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
 
-    for param in vgg_loss.parameters():
-        param.requires_grad = False
+	for param in vgg_loss.parameters():
+		param.requires_grad = False
 
-    for epoch in range(num_epochs):
+	for epoch in range(num_epochs):
 
-        # trains the model for one epoch
-        train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name=main_hyperparameters)
+		# trains the model for one epoch
+		train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name=main_hyperparameters)
 
-        # evaluate on the validation set
-        val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, vgg_loss, model_name=main_hyperparameters)
+		# evaluate on the validation set
+		val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, vgg_loss, model_name=main_hyperparameters)
 
-        # adjust the learning rate if val loss stops improving
-        scheduler.step(val_loss)
+		# adjust the learning rate if val loss stops improving
+		scheduler.step(val_loss)
 
-        # remember the best psnr value and save the checkpoint model
-        is_best = val_psnr_avg > best_avg_psnr
-        best_avg_psnr = max(val_psnr_avg, best_avg_psnr)
-        save_checkpoint(main_hyperparameters, {
-            'epoch': epoch + 1,
-            'state_dict': model.state_dict(),
-            'best_psnr': best_avg_psnr,
-        }, is_best)
+			# remember the best psnr value and save the checkpoint model
+		is_best = val_psnr_avg > best_avg_psnr
+		best_avg_psnr = max(val_psnr_avg, best_avg_psnr)
+		save_checkpoint(main_hyperparameters, {
+			'epoch': epoch + 1,
+			'state_dict': model.state_dict(),
+			'best_psnr': best_avg_psnr,
+		}, is_best)
 
-    print("Best PSNR on the validation set: {}".format(best_avg_psnr))
+	print("Best PSNR on the validation set: {}".format(best_avg_psnr))
