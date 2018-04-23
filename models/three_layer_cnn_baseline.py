@@ -32,7 +32,5 @@ class ThreeLayerCNNBasline(nn.Module):
         )
 
     def forward(self,x):
-        print("Input shape: ", x.size())
         out = self.model(x)
-        print("Output shape: ", out.size())
         return out
