@@ -40,8 +40,8 @@ def train(train_loader, model, criterion, optimizer, epoch):
 			    target = target.cuda()
 
 			# compute output from CNN model
-			output = model(input.float())
-			loss = criterion(output, target.float())
+			output = model(input)
+			loss = criterion(output, target)
 
 			# measure psnr and loss
 			psnr = calc_psnr(loss.data[0])

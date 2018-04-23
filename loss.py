@@ -56,7 +56,7 @@ def perceptual_loss(pred, target):
 	inp = vgg_loss(pred.cuda())
 	tar = vgg_loss(target.cuda())
 
-	lossFunction = nn.MSELoss(size_average=False).cuda()
-	loss = lossFunction(tar, inp)
+	lossFunction = nn.MSELoss(size_average=False)
+	loss = lossFunction(inp, tar)
 
 	return loss
