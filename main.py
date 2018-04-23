@@ -153,7 +153,7 @@ def validate(val_loader, model, loss, epoch, vgg_loss):
 		writer.add_scalar("PSNR/Val", psnr_meter.avg, epoch)
 		writer.add_scalar("Loss/Val", losses_meter.avg, epoch)
 
-return losses_meter.avg, psnr_meter.avg
+	return losses_meter.avg, psnr_meter.avg
 
 
 def calc_psnr(mse):
