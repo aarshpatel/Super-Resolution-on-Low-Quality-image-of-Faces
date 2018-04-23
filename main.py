@@ -59,13 +59,14 @@ def train(train_loader, model, criterion, optimizer, epoch):
 
 			if iteration % 100 == 0:
 
-				if opt.tensorboard:
-					model_output_image = output.data
-					model_input_image = input.data.float()
-					model_target_image = target.data.float()
+				model_output_image = output.data
+				model_input_image = input.data.float()
+				model_target_image = target.data.float()
 
-					# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
-					vis_image = torch.cat((model_input_image, model_target_image))
+				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
+				vis_image = torch.cat((model_input_image, model_target_image))
+
+				if opt.tensorboard:
 
 					x = vutils.make_grid(vis_image, normalize=True)
 					y = vutils.make_grid(model_output_image, normalize=True)
@@ -73,7 +74,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
 					writer.add_image('Input-Image', x, epoch*iteration)
 					writer.add_image('Reconsructed-Image', y, epoch*iteration)
 					
-
+				if opt.save_img_on_runs:					
+					save_img_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter.jpg".format(epoch, iteration)
+					vutils.save_image(model_output_image, filename=save_img_filename)
+					
 				print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -181,7 +185,7 @@ if __name__ == "__main__":
 	parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
 	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
 	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
-
+	parser.add_argument('--save_img_on_runs', actions="store_true", help="save the output images when training the model")
 	global opt, writer, best_avg_psnr
 	opt = parser.parse_args()
 
