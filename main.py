@@ -20,7 +20,7 @@ from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
 from torchvision import models
 
-def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
+def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name):
 	""" Train the model for one epoch """
 
 	batch_time_meter = AverageMeter()
@@ -70,22 +70,20 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 		start = time.time()
 
 		if iteration % 100 == 0:
+			
+			new_output_dir = "./images_from_runs/{0}/train/".format(model_name)
+
+			if not os.path.exists(new_output_dir):
+				os.makedirs(new_output_dir)
 
 			model_output_image = output.data.float()
 			model_input_image = input.data.float()
 			model_target_image = target.data.float()
 
-			all_images = torch.cat((model_input_image, model_output_image, model_target_image))
-
-			if opt.tensorboard:
-				all_images_grid = vutils.make_grid(all_images, normalize=True)
-
-				writer.add_image('Image Reconstruction', all_images_grid, epoch * iteration)
-
 			if opt.save_img:
-				save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
-				vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
-
+				filename = new_output_dir + "{0}_epoch_{1}_iter.jpg".format(epoch, iteration)
+				save_image(input=model_input_image, output=model_output_image, target=model_target_image, filename=filename)
+				
 			print('Epoch: [{0}][{1}/{2}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -99,7 +97,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 		writer.add_scalar("Loss/Train", losses_meter.avg, epoch)
 
 
-def validate(val_loader, model, loss_type, epoch, vgg_loss):
+def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
 	losses_meter = AverageMeter()
@@ -141,6 +139,20 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss):
 		start = time.time()
 
 		if iteration % 100 == 0:
+			
+			new_output_dir = "./images_from_runs/{0}/val/".format(model_name)
+
+			if not os.path.exists(new_output_dir):
+				os.makedirs(new_output_dir)
+
+			model_output_image = output.data.float()
+			model_input_image = input.data.float()
+			model_target_image = target.data.float()
+
+			if opt.save_img:
+				filename = new_output_dir + "{0}_epoch_{1}_iter.jpg".format(epoch, iteration)
+				save_image(input=model_input_image, output=model_output_image, target=model_target_image, filename=filename)
+
 			print('Test: [{0}/{1}]\t'
 					'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
 					'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
@@ -175,8 +187,13 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
+def save_image(input, output, target, filename):
+	""" Save the input, output, target image during training"""
+	all_images = torch.cat((input, output, target))
+	vutils.save_image(all_images, filename=filename, normalize=True)
 
 def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
+	
     """Saves model checkpoint to disk"""
     directory = "model_runs/%s/" % (name)
     if not os.path.exists(directory):
@@ -285,10 +302,10 @@ if __name__ == "__main__":
     for epoch in range(num_epochs):
 
         # trains the model for one epoch
-        train(train_loader, model, loss_type, optimizer, epoch, vgg_loss)
+        train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name=main_hyperparameters)
 
         # evaluate on the validation set
-        val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, vgg_loss)
+        val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, vgg_loss, model_name=main_hyperparameters)
 
         # adjust the learning rate if val loss stops improving
         scheduler.step(val_loss)
