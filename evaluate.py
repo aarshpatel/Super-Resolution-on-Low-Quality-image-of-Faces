@@ -28,6 +28,8 @@ class AverageMeter(object):
 def evaluate_on_test(model, test_loader, metrics):
 	""" Evaluate the trained model on the test data using some specified metric """
 
+	print("Metrics: ", metrics)
+
 	psnr_meter = AverageMeter()
 	ssim_meter = AverageMeter()
 
