@@ -13,15 +13,12 @@ def create_loss_model(vgg, end_layer, use_maxpool=True, use_cuda=False):
     """
 
     vgg = copy.deepcopy(vgg)
-
     model = nn.Sequential()
-
     if use_cuda:
         model.cuda()
 
     i = 0
     for layer in list(vgg):
-
         if i > end_layer:
             break
 
