@@ -63,24 +63,17 @@ def train(train_loader, model, criterion, optimizer, epoch):
 				model_input_image = input.data.float()
 				model_target_image = target.data.float()
 
-				# vis_image = torch.cat((model_output_image, model_input_image, model_target_image))
-				vis_image = torch.cat((model_input_image, model_target_image))
-
 				all_images = torch.cat((model_input_image, model_output_image, model_target_image))
 
 				if opt.tensorboard:
 
-					x = vutils.make_grid(vis_image, normalize=True)
-					y = vutils.make_grid(model_output_image, normalize=True)
+					all_images_grid = vutils.make_grid(all_images, normalize=True)
 
-					writer.add_image('Input-Image', x, epoch*iteration)
-					writer.add_image('Reconsructed-Image', y, epoch*iteration)
+					writer.add_image('Image Reconstruction', all_images_grid, epoch*iteration)
 					
 				if opt.save_img:					
 					save_img_output_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_output.jpg".format(epoch, iteration)
-					# save_img_input_target_filename = "./saved_image_from_runs/{0}_epoch_{1}_iter_gt.jpg".format(epoch, iteration)
 					vutils.save_image(all_images, filename=save_img_output_filename, normalize=True)
-					# vutils.save_image(vis_image, filename=save_img_input_target_filename, normalize=True)
 					
 					
 				print('Epoch: [{0}][{1}/{2}]\t'
@@ -145,7 +138,7 @@ def validate(val_loader, model, criterion, epoch):
 
 def calc_psnr(mse):
 	"""Calculate the psnr (Peak Signal Noise Ratio)"""
-	return 20 * log10(255.0/np.sqrt(mse))	
+	return 10 * log10((255.0**2)/float(mse))
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
