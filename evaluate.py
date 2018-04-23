@@ -8,7 +8,7 @@ import numpy as np
 import torch.nn as nn
 from torch.autograd import Variable
 from scripts.metrics import calc_psnr, calc_ssim
-from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
+from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 	print(method)
 	print(size)
 	print(model)
-	
+
 	if grayscale:
 		image_color = "grayscale"
 	else:
@@ -112,23 +112,20 @@ if __name__ == "__main__":
 
 	if model == "ThreeLayerCNNBaseline":
 		print("Loading model: ", model)
-		model = ThreeLayerCNNBasline()
+		model = ThreeLayerCNNBaseline()
 	else:
 		print("Loading some other model")	
 
 
 	trained_model_params = torch.load(model_name)
+
+	# load in the model weights
 	model.load_state_dict(trained_model_params['state_dict'])
+
+	# evaluate the model on the test data
 	psnr_test_avg, ssim_test_avg = evaluate_on_test(model, test_loader, metrics)
 
 	if "psnr" in metrics:
 		print("PSNR AVG: ", psnr_test_avg)
 	elif "ssim" in metrics:
 		print("SSIM AVG: ", ssim_test_avg)
-
-
-
-
-
-
-
