@@ -82,11 +82,14 @@ if __name__ == "__main__":
 	use_cuda = opt.cuda
 	
 	model_name_split_parameters = model_name.split("/")[2].split("_")
-	print(model_name_split_parameters)
-	method = model_name_split_parameters[2]
-	size = int(model_name_split_parameters[3])
-	model = model_name_split_parameters[1].split("/")[1]
+	method = model_name_split_parameters[1].split("=")[1]
+	size = int(model_name_split_parameters[2].split("=")[1])
+	model = model_name_split_parameters[0]
 
+	print(method)
+	print(size)
+	print(model)
+	
 	if grayscale:
 		image_color = "grayscale"
 	else:
