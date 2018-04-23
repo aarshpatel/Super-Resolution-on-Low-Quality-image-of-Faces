@@ -1,3 +1,5 @@
 ./data/*
 ./.idea/
 ./runs/*
+./.vscode/*
+./ipynb_checkpoints/*

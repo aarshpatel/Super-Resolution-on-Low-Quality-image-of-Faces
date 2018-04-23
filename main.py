@@ -14,8 +14,9 @@ import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
-from models.three_layer_cnn_baseline import ThreeLayerCNNBasline
+from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
 from scripts.metrics import calc_psnr
+from scripts.average_meter import AverageMeter
 from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
 from torchvision import models
@@ -96,7 +97,6 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name
 		writer.add_scalar("PSNR/train ", psnr_meter.avg, epoch)
 		writer.add_scalar("Loss/train", losses_meter.avg, epoch)
 
-
 def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
@@ -169,25 +169,6 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 
 	return losses_meter.avg, psnr_meter.avg
 
-
-class AverageMeter(object):
-    """Computes and stores the average and current value"""
-
-    def __init__(self):
-        self.reset()
-
-    def reset(self):
-        self.val = 0
-        self.avg = 0
-        self.sum = 0
-        self.count = 0
-
-    def update(self, val, n=1):
-        self.val = val
-        self.sum += val * n
-        self.count += n
-        self.avg = self.sum / self.count
-
 def save_image(input, output, target, filename):
 	""" Save the input, output, target image during training """
 	all_images = torch.cat((input, output, target))
@@ -203,10 +184,9 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
     if is_best:
         shutil.copyfile(filename, 'saved_models/%s/' % (name) + 'model_best.pth.tar')
 
-
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-	parser.add_argument("--model", type=str, default="ThreeLayerCNNBasline", help="type of model to use for facial reconstruction")
+	parser.add_argument("--model", type=str, default="ThreeLayerCNNBaseline", help="type of model to use for facial reconstruction")
 	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
 	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
 	parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
@@ -278,7 +258,7 @@ if __name__ == "__main__":
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the model
-	model = ThreeLayerCNNBasline()
+	model = ThreeLayerCNNBaseline()
 
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)

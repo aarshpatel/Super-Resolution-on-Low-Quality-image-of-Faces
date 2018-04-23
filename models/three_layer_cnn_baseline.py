@@ -1,12 +1,12 @@
 import torch.nn as nn
 
-class ThreeLayerCNNBasline(nn.Module):
+class ThreeLayerCNNBaseline(nn.Module):
     """ 
     Simple three layer baseline that uses Conv Tranpose to upscale the image to the input image size 
     """
 
     def __init__(self, batchnorm=False):
-        super(ThreeLayerCNNBasline,self).__init__()
+        super(ThreeLayerCNNBaseline,self).__init__()
         N = 3
         D_in = 5 
         D_mid = 5
