@@ -44,7 +44,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
 			loss = criterion(output, target.float())
 
 			# measure psnr and loss
-			psnr = 20 * log10(1/np.sqrt(loss.data[0]))
+			psnr = calc_psnr(loss.data[0])
 			psnr_meter.update(psnr, input.size(0))
 			losses_meter.update(loss.data[0], input.size(0))
 
@@ -85,9 +85,6 @@ def train(train_loader, model, criterion, optimizer, epoch):
 		writer.add_scalar("PSNR/Train", psnr_meter.avg, epoch)
 		writer.add_scalar("Loss/Train", losses_meter.avg, epoch)
 
-def to_np(x):
-    return x.data.cpu().numpy()
-
 def validate(val_loader, model, criterion, epoch):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
@@ -112,7 +109,7 @@ def validate(val_loader, model, criterion, epoch):
 		loss = criterion(output, target.float())
 
 		# compute the psnr and loss on the validation set
-		psnr = 20 * log10(1/np.sqrt(loss.data[0]))
+		psnr = calc_psnr(loss.data[0])
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
@@ -136,9 +133,9 @@ def validate(val_loader, model, criterion, epoch):
 
 	return losses_meter.avg, psnr_meter.avg
 
-def test_ssim(model):
-	""" Calculate the avg. SSIM (Structural Similarity) across the test set """
-	pass
+def calc_psnr(mse):
+	"""Calculate the psnr (Peak Signal Noise Ratio)"""
+	return 20 * log10(1.0/np.sqrt(mse))	
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -156,12 +153,6 @@ class AverageMeter(object):
         self.sum += val * n
         self.count += n
         self.avg = self.sum / self.count
-
-def save_model(model, model_name, location):
-	model_out_path = location + model_name + ".pth"
-	torch.save(model.state_dict(), model_out_path)
-	# torch.save(model, model_out_path)
-	print("Model saved to {}".format(model_out_path))
 
 def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
     """Saves model checkpoint to disk"""
@@ -197,7 +188,6 @@ if __name__ == "__main__":
 	writer = SummaryWriter("./runs/")
 
 	best_avg_psnr = 0
-	best_avg_ssim = 0
 
 	# get the arguments from argparse
 	num_epochs = opt.epochs
@@ -220,15 +210,15 @@ if __name__ == "__main__":
 	else:
 		image_color = "rgb"
 
-
-	# normalize each image and divide by 255
+	#################
+	# Normalization # 
+	#################
 	train_mean = np.array([150.79660111, 115.31313646,  94.28781092])
 	train_std = np.array([52.17929494, 44.20110692, 42.75483222])
 	normalize = transforms.Normalize(mean=[x/255.0 for x in train_mean],
                                      std=[x/255.0 for x in train_std])
 
 	transform_normalize = transforms.Compose([
-		transforms.RandomHorizontalFlip(),
 		transforms.ToTensor(),
 		normalize,
     ])
