@@ -20,7 +20,7 @@ from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
 from torchvision import models
 
-def train(train_loader, model, loss, optimizer, epoch, vgg_loss):
+def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 	""" Train the model for one epoch """
 
 	batch_time_meter = AverageMeter()
@@ -46,7 +46,7 @@ def train(train_loader, model, loss, optimizer, epoch, vgg_loss):
 		output = model(input)
 
 		# calculate the loss (pixel or perceptual)
-		if loss == "perceptual":
+		if loss_type == "perceptual":
 			vgg_loss_input = vgg_loss(output.cuda())
 			vgg_loss_target = vgg_loss(target.cuda())
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
@@ -98,7 +98,7 @@ def train(train_loader, model, loss, optimizer, epoch, vgg_loss):
 		writer.add_scalar("Loss/Train", losses_meter.avg, epoch)
 
 
-def validate(val_loader, model, loss, epoch, vgg_loss):
+def validate(val_loader, model, loss_type, epoch, vgg_loss):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
 	losses_meter = AverageMeter()
@@ -122,7 +122,7 @@ def validate(val_loader, model, loss, epoch, vgg_loss):
 		output = model(input.float())
 
 		# calculate the loss (pixel or perceptual)
-		if loss == "perceptual":
+		if loss_type == "perceptual":
 			vgg_loss_input = vgg_loss(output.cuda())
 			vgg_loss_target = vgg_loss(target.cuda())
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
@@ -224,7 +224,7 @@ if __name__ == "__main__":
     size = opt.size
     batch_size = opt.batch_size
     use_cuda = opt.cuda
-    loss = opt.loss
+    loss_type = opt.loss
     num_workers = opt.threads
     weight_decay = opt.weight_decay
     grayscale = opt.grayscale
@@ -289,10 +289,10 @@ if __name__ == "__main__":
     for epoch in range(num_epochs):
 
         # trains the model for one epoch
-        train(train_loader, model, loss, optimizer, epoch, vgg_loss)
+        train(train_loader, model, loss_type, optimizer, epoch, vgg_loss)
 
         # evaluate on the validation set
-        val_loss, val_psnr_avg = validate(val_loader, model, loss, epoch, vgg_loss)
+        val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, vgg_loss)
 
         # adjust the learning rate if val loss stops improving
         scheduler.step(val_loss)
