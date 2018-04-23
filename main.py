@@ -47,15 +47,16 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 
 		# calculate the loss (pixel or perceptual)
 		if loss_type == "perceptual":
-			vgg_loss_input = vgg_loss(output)
+			vgg_loss_output = vgg_loss(output)
 			vgg_loss_target = vgg_loss(target)
-			loss = loss_fn(vgg_loss_input, vgg_loss_target)
+			loss = loss_fn(vgg_loss_output, vgg_loss_target)
 		else:
 			loss = loss_fn(output, target)
 
 		# measure psnr and loss
 		mse = loss_fn(output, target)
 		psnr = calc_psnr(mse.data[0])
+
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
@@ -119,7 +120,7 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss):
 			target = target.cuda()
 
 		# compute output from CNN model
-		output = model(input.float())
+		output = model(input)
 
 		# calculate the loss (pixel or perceptual)
 		if loss_type == "perceptual":
@@ -157,10 +158,11 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss):
 
 
 def calc_psnr(mse):
-    """Calculate the psnr (Peak Signal Noise Ratio)"""
-    rmse = np.sqrt(mse)
-    return 20 * log10(1.0 / rmse)
-
+	"""Calculate the psnr (Peak Signal Noise Ratio)"""
+	# rmse = np.sqrt(mse)
+	# return 20 * log10(1.0 / rmse)
+	return (20 * log10(255.0)) - (10 * log10(mse))
+    
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
