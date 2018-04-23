@@ -50,12 +50,11 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss):
 			vgg_loss_input = vgg_loss(output)
 			vgg_loss_target = vgg_loss(target)
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
-			mse = loss_fn(output, target)
 		else:
 			loss = loss_fn(output, target)
-			mse = loss
 
 		# measure psnr and loss
+		mse = loss_fn(output, target)
 		psnr = calc_psnr(mse.data[0])
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
