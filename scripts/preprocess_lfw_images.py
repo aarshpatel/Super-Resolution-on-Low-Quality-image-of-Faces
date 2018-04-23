@@ -5,10 +5,11 @@ import numpy as np
 import os
 import cv2 #opencv
 import argparse
+from random import shuffle
+import random
 
-# TODO
-# 1) Make the code take in any dataset and apply any size crop, blurring, pixelation
-# 2) Should be highly customizable
+np.random.seed(5)
+random.seed(5)
 
 def crop_img_to_size(img, size, output):
     """ Apply crop to image """
@@ -58,7 +59,6 @@ def create_train_test_val_sets(input_dir, output_dir, crop_size=110, grayscale=T
         print("Making dir: ", new_output_dir)
         os.makedirs(new_output_dir)
 
-
     for subdir, _, files in os.walk(input_dir):
         for file in files:
             image_file_path = os.path.join(subdir, file)
@@ -75,8 +75,12 @@ def create_train_test_val_sets(input_dir, output_dir, crop_size=110, grayscale=T
                 all_images.append(img)
 
     print("Num of images in the dataset: ", len(all_images))
+    zipped_images = zip(all_images, file_names)
+    shuffle(zipped_images)
+    all_images, file_names = zip(*zipped_images)
 
     all_images = np.array(all_images)
+
     train = all_images[:8000, :, :, :]
     val = all_images[8000:10646, :, :, :]
     test = all_images[10646:, :, :, :]
