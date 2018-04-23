@@ -74,13 +74,14 @@ if __name__ == "__main__":
 
 	model_name = opt.model
 
-	print("model:", model_name)
 
 	grayscale = opt.grayscale
 	batch_size = opt.batch_size
 	metrics = opt.metrics
 	num_workers = opt.threads
 	use_cuda = opt.cuda
+
+	print(model_name.split("/"))
 	
 	model_name_split_parameters = model_name.split("_")
 	method = model_name_split_parameters[2]
