@@ -1,5 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
+import torchvision.transforms as transforms
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.optim as optim
@@ -43,7 +44,7 @@ def train(train_loader, model, criterion, optimizer, epoch):
 			loss = criterion(output, target.float())
 
 			# measure psnr and loss
-			psnr = 20 * log10(255/np.sqrt(loss.data[0]))
+			psnr = 20 * log10(1/np.sqrt(loss.data[0]))
 			psnr_meter.update(psnr, input.size(0))
 			losses_meter.update(loss.data[0], input.size(0))
 
@@ -87,26 +88,6 @@ def train(train_loader, model, criterion, optimizer, epoch):
 def to_np(x):
     return x.data.cpu().numpy()
 
-def test_psnr(model, data_loader):
-	""" Calculate the avg psnr across the test set """
-	avg_psnr = 0
-	loss = nn.MSELoss()
-
-	for batch in data_loader:
-		input, target = Variable(batch[0]), Variable(batch[1])
-
-		if use_cuda:
-			input = input.cuda()
-			target = target.cuda()
-
-		prediction = model(input.float())
-
-		mse = loss(prediction, target.float())
-		psnr = 20 * log10(255/np.sqrt(mse.data[0]))
-		avg_psnr += psnr
-
-	return avg_psnr / float(len(data_loader))
-
 def validate(val_loader, model, criterion, epoch):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
@@ -131,7 +112,7 @@ def validate(val_loader, model, criterion, epoch):
 		loss = criterion(output, target.float())
 
 		# compute the psnr and loss on the validation set
-		psnr = 20 * log10(255/np.sqrt(loss.data[0]))
+		psnr = 20 * log10(1/np.sqrt(loss.data[0]))
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
@@ -211,9 +192,14 @@ if __name__ == "__main__":
 
 	global opt, writer, best_avg_psnr
 	opt = parser.parse_args()
-	writer = SummaryWriter("./runs/")
-	best_avg_psnr = 0
 
+	# setup the tensorboard 
+	writer = SummaryWriter("./runs/")
+
+	best_avg_psnr = 0
+	best_avg_ssim = 0
+
+	# get the arguments from argparse
 	num_epochs = opt.epochs
 	lr = opt.lr
 	method = opt.method
@@ -233,13 +219,26 @@ if __name__ == "__main__":
 		image_color = "grayscale"
 	else:
 		image_color = "rgb"
-		
+
+
+	# normalize each image and divide by 255
+	train_mean = np.array([150.79660111, 115.31313646,  94.28781092])
+	train_std = np.array([52.17929494, 44.20110692, 42.75483222])
+	normalize = transforms.Normalize(mean=[x/255.0 for x in train_mean],
+                                     std=[x/255.0 for x in train_std])
+
+	transform_normalize = transforms.Compose([
+		transforms.RandomHorizontalFlip(),
+		transforms.ToTensor(),
+		normalize,
+    ])
+
 	# get the training data
-	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="train", train_mean=None, total_num_images=None)
+	train_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="train", transform=transform_normalize)
 	train_loader = DataLoader(train_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
 	# get the validation set
-	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="val")
+	val_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size, grayscale=False, data_type="val", transform=transform_normalize)
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the test set
