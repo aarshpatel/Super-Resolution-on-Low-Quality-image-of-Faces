@@ -93,8 +93,8 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name
 
 	# log value to tensorboard or visdom
 	if opt.tensorboard:
-		train_writer.add_scalar("PSNR", psnr_meter.avg, epoch)
-		train_writer.add_scalar("Loss", losses_meter.avg, epoch)
+		writer.add_scalar("PSNR/train ", psnr_meter.avg, epoch)
+		writer.add_scalar("Loss/train", losses_meter.avg, epoch)
 
 
 def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
@@ -164,8 +164,8 @@ def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
 	print("AVG PSNR after epoch {0}: {1}".format(epoch, psnr_meter.avg))
 
 	if opt.tensorboard:
-		val_writer.add_scalar("PSNR", psnr_meter.avg, epoch)
-		val_writer.add_scalar("Loss", losses_meter.avg, epoch)
+		writer.add_scalar("PSNR/val", psnr_meter.avg, epoch)
+		writer.add_scalar("Loss/val", losses_meter.avg, epoch)
 
 	return losses_meter.avg, psnr_meter.avg
 
@@ -225,9 +225,7 @@ if __name__ == "__main__":
 	opt = parser.parse_args()
 
 	# setup the tensorboard
-	train_writer = SummaryWriter("./runs/") 
-	val_writer = SummaryWriter("./runs/")
-
+	writer = SummaryWriter("./runs/") 
 	
 	best_avg_psnr = 0
 
@@ -244,11 +242,11 @@ if __name__ == "__main__":
 	grayscale = opt.grayscale
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
-																										opt.method,
-																										opt.size,
-																										opt.loss, opt.lr,
-																										opt.epochs,
-																										opt.batch_size)
+																									opt.method,
+																									opt.size,
+																									opt.loss, opt.lr,
+																									opt.epochs,
+																									opt.batch_size)
 	print("Hyperparameters: ", main_hyperparameters)
 
 	if grayscale:
