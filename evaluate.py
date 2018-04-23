@@ -109,7 +109,6 @@ if __name__ == "__main__":
 											grayscale=False, data_type="test", transform=transform_normalize)
 	test_loader = DataLoader(test_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
-
 	if model == "ThreeLayerCNNBaseline":
 		print("Loading model: ", model)
 		model = ThreeLayerCNNBaseline()
@@ -121,6 +120,8 @@ if __name__ == "__main__":
 
 	# load in the model weights
 	model.load_state_dict(trained_model_params['state_dict'])
+
+	model.cuda()
 
 	# evaluate the model on the test data
 	psnr_test_avg, ssim_test_avg = evaluate_on_test(model, test_loader, metrics)
