@@ -22,11 +22,11 @@ class ResnetSubPixelCNN(nn.Module):
             nn.BatchNorm2d(64)
         )
         self.upsample = nn.Sequential(
-            nn.Conv2d(64, 12, kernel_size=3, stride=1, padding=2),
+            nn.Conv2d(64, 12, kernel_size=3, stride=1, padding=1),
             nn.PixelShuffle(2),
             nn.PReLU()
         )
-        self.out = nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=2)
+        self.out = nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=1)
 
     def forward(self, x):
         print "Input: ", x.size()
