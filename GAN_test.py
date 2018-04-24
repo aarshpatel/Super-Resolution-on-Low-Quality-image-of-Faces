@@ -337,7 +337,7 @@ if __name__ == "__main__":
     # ============================
 
     # get the model Generative
-    modelG = ThreeLayerCNNGen()
+    modelG = ResnetSubPixelCNN()
 
     # set the optimizer Generative
     optimizerG = optim.Adam(modelG.parameters(), lr=lr, weight_decay=weight_decay)
