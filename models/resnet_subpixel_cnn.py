@@ -48,7 +48,6 @@ class ResnetSubPixelCNN(nn.Module):
 
 
 class ResidualBlock(nn.Module):
-
     def __init__(self, N):
         super(ResidualBlock, self).__init__()
         self.layer1 = nn.Conv2d(N, N, kernel_size=3, stride=1, padding=2)
