@@ -40,7 +40,7 @@ class ResnetSubPixelCNN(nn.Module):
         block3 = self.block3(block2)
         block4 = self.block4(block3)
         block5 = self.block5(block4)
-        block6 = block5 + self.block6(block5)
+        block6 = block0 + self.block6(block5)
         block7 = self.block7(block6)
         block8 = self.block8(block7)
         out = self.out(block8)
