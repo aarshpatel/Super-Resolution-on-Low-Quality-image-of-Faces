@@ -21,17 +21,12 @@ class ResnetSubPixelCNN(nn.Module):
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=2),
             nn.BatchNorm2d(64)
         )
-        self.block7 = nn.Sequential(
+        self.upsample = nn.Sequential(
             nn.Conv2d(64, 12, kernel_size=3, stride=1, padding=2),
             nn.PixelShuffle(2),
             nn.PReLU()
         )
-        self.block8 = nn.Sequential(
-            nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=2),
-            nn.PixelShuffle(1),
-            nn.PReLU()
-        )
-        self.out = nn.Conv2d(3, 3, kernel_size=4, stride=2, padding=1)
+        self.out = nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=2)
 
     def forward(self, x):
         print "Input: ", x.size()
@@ -41,10 +36,12 @@ class ResnetSubPixelCNN(nn.Module):
         block3 = self.block3(block2)
         block4 = self.block4(block3)
         block5 = self.block5(block4)
-        block6 = block0 + self.block6(block5)
-        block7 = self.block7(block6)
-        block8 = self.block8(block7)
-        out = self.out(block8)
+        block6 = self.block6(block5)
+        print(block0.size())
+        print(block6.size())
+        block7 = self.upsample(block0 + block6) 
+        print(block7.size())
+        out = self.out(block7)
         print "Output: ", out.size()
         return out
 
