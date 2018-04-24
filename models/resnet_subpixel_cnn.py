@@ -36,9 +36,6 @@ class ResnetSubPixelCNN(nn.Module):
     def forward(self, x):
         print "Input: ", x.size()
         block0 = self.block0(x)
-
-        print("Block 0 output: ", block0.size())
-
         block1 = self.block1(block0)
         block2 = self.block2(block1)
         block3 = self.block3(block2)
@@ -55,10 +52,10 @@ class ResnetSubPixelCNN(nn.Module):
 class ResidualBlock(nn.Module):
     def __init__(self, N):
         super(ResidualBlock, self).__init__()
-        self.layer1 = nn.Conv2d(N, N, kernel_size=3, stride=1, padding=2)
+        self.layer1 = nn.Conv2d(N, N, kernel_size=3, stride=1, padding=1)
         self.layer2 = nn.BatchNorm2d(N)
         self.layer3 = nn.PReLU()
-        self.layer4 = nn.Conv2d(N, N, kernel_size=3, stride=1, padding=2)
+        self.layer4 = nn.Conv2d(N, N, kernel_size=3, stride=1, padding=1)
         self.layer5 = nn.BatchNorm2d(N)
 
     def forward(self, x):
