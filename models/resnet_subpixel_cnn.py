@@ -59,8 +59,10 @@ class ResidualBlock(nn.Module):
         self.layer5 = nn.BatchNorm2d(N)
 
     def forward(self, x):
-        residual = x
-        out = self.layer5(self.layer4(self.layer3(self.layer2(self.layer1(x)))))
-        out += residual
-        return out
+        residual = self.layer1(x)
+        residual = self.layer2(residual)
+        residual = self.layer3(residual)
+        residual = self.layer4(residual)
+        residual = self.layer5(residual)
+        return x + residual
 
