@@ -14,7 +14,7 @@ from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
 from models.resnet_subpixel_cnn import ResnetSubPixelCNN
 from models.three_layer_cnn_Disc import ThreeLayerCNNDisc
- scripts.metrics import calc_psnr
+from scripts.metrics import calc_psnr
 from loss import create_loss_model
 from torchvision import models
 
