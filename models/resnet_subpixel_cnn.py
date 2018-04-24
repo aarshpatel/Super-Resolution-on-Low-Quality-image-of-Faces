@@ -36,6 +36,9 @@ class ResnetSubPixelCNN(nn.Module):
     def forward(self, x):
         print "Input: ", x.size()
         block0 = self.block0(x)
+
+        print("Block 0 output: ", block0.size())
+
         block1 = self.block1(block0)
         block2 = self.block2(block1)
         block3 = self.block3(block2)
