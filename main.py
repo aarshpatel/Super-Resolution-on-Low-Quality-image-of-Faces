@@ -22,7 +22,7 @@ from scripts.plots import plot_training_loss, plot_train_val_psnr
 from loss import create_loss_model
 from torchvision import models
 
-def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name):
+def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss=None):
 	""" Train the model for one epoch """
 
 	batch_time_meter = AverageMeter()
@@ -98,7 +98,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name
 		writer.add_scalar("PSNR/train ", psnr_meter.avg, epoch)
 		writer.add_scalar("Loss/train", losses_meter.avg, epoch)
 
-def validate(val_loader, model, loss_type, epoch, vgg_loss, model_name):
+def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 	""" Validate the model on the validation set """
 	batch_time_meter = AverageMeter()
 	losses_meter = AverageMeter()
@@ -228,7 +228,7 @@ if __name__ == "__main__":
 																									opt.loss, opt.lr,
 																									opt.epochs,
 																									opt.batch_size)
-	print("Hyperparameters: ", main_hyperparameters)
+	print "Hyperparameters: ", main_hyperparameters
 
 	if grayscale:
 		image_color = "grayscale"
@@ -274,6 +274,7 @@ if __name__ == "__main__":
 		model = model.cuda()
 
 	# Setup the VGG for Perceptual Los
+	vgg_loss = None
 	if loss_type == "perceptual":
 		vgg16 = models.vgg16(pretrained=True).features
 		vgg16.cuda()
@@ -285,10 +286,10 @@ if __name__ == "__main__":
 	for epoch in range(num_epochs):
 
 		# trains the model for one epoch
-		train(train_loader, model, loss_type, optimizer, epoch, vgg_loss, model_name=main_hyperparameters)
+		train(train_loader, model, loss_type, optimizer, epoch, model_name=main_hyperparameters, vgg_loss=vgg_loss)
 
 		# evaluate on the validation set
-		val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, vgg_loss, model_name=main_hyperparameters)
+		val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, model_name=main_hyperparameters, vgg_loss=vgg_loss)
 
 		# adjust the learning rate if val loss stops improving
 		scheduler.step(val_loss)
