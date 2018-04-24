@@ -26,6 +26,7 @@ class ResnetSubPixelCNN(nn.Module):
             nn.PixelShuffle(2),
             nn.PReLU()
         )
+
         self.out = nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=1)
 
     def forward(self, x):
@@ -37,12 +38,8 @@ class ResnetSubPixelCNN(nn.Module):
         block4 = self.block4(block3)
         block5 = self.block5(block4)
         block6 = self.block6(block5)
-        print(block0.size())
-        print(block6.size())
         block7 = self.upsample(block0 + block6) 
-        print(block7.size())
         out = self.out(block7)
-        print "Output: ", out.size()
         return out
 
 
