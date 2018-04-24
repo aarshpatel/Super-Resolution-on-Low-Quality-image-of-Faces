@@ -15,6 +15,7 @@ import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
 from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
+from models.resnet_subpixel_cnn import ResnetSubPixelCNN
 from scripts.metrics import calc_psnr
 from scripts.average_meter import AverageMeter
 from scripts.plots import plot_training_loss, plot_train_val_psnr
@@ -258,7 +259,10 @@ if __name__ == "__main__":
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the model
-	model = ThreeLayerCNNBaseline()
+	if opt.model == "ThreeLayerCNNBaseline": 
+		model = ThreeLayerCNNBaseline()
+	elif opt.model == "ResnetSubPixelCNN":
+		model = ResnetSubPixelCNN()
 
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
@@ -269,13 +273,14 @@ if __name__ == "__main__":
 	if use_cuda:
 		model = model.cuda()
 
-	# Setup the VGG for Perceptual Loss
-	vgg16 = models.vgg16(pretrained=True).features
-	vgg16.cuda()
-	vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
+	# Setup the VGG for Perceptual Los
+	if loss_type == "perceptual":
+		vgg16 = models.vgg16(pretrained=True).features
+		vgg16.cuda()
+		vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
 
-	for param in vgg_loss.parameters():
-		param.requires_grad = False
+		for param in vgg_loss.parameters():
+			param.requires_grad = False
 
 	for epoch in range(num_epochs):
 
