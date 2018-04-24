@@ -30,7 +30,6 @@ class ResnetSubPixelCNN(nn.Module):
         self.out = nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=1)
 
     def forward(self, x):
-        print "Input: ", x.size()
         block0 = self.block0(x)
         block1 = self.block1(block0)
         block2 = self.block2(block1)
