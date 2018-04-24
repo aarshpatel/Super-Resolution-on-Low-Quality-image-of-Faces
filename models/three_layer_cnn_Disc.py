@@ -1,14 +1,13 @@
 import torch.nn as nn
 
 
-class ThreeLayerCNNDisc(nn.Module):
+class DiscriminatorCNN(nn.Module):
     """ 
-    Simple three layer baseline that uses padding to perseve the spatial size 
-    This is similar to the SRCNN model that was presented here:  https://arxiv.org/pdf/1501.00092.pdf
+    GIVE THIS A DESCRIPTION MIKE!!!!!!!!!!!!!!!!!!!
     """
 
     def __init__(self):
-        super(ThreeLayerCNNDisc,self).__init__()
+        super(DiscriminatorCNN,self).__init__()
         self.model = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=3, padding=1),
             nn.LeakyReLU(),
