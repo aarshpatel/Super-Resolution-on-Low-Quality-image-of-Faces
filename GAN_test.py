@@ -13,7 +13,7 @@ import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
 from models.resnet_subpixel_cnn import ResnetSubPixelCNN
-from models.three_layer_cnn_Disc import ThreeLayerCNNDisc
+from models.discriminator_cnn import DiscriminatorCNN
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
 from torchvision import models
@@ -353,7 +353,7 @@ if __name__ == "__main__":
     # ============================
 
     # get the model Discriminative
-    modelD = ThreeLayerCNNDisc()
+    modelD = DiscriminatorCNN()
 
     # set the optimizer Discriminative
     optimizerD = optim.Adam(modelD.parameters(), lr=lr, weight_decay=weight_decay)
