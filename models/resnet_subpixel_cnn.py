@@ -27,11 +27,12 @@ class ResnetSubPixelCNN(nn.Module):
             nn.PReLU()
         )
         self.block8 = nn.Sequential(
-            nn.Conv2d(N, N, kernel_size=3, stride=1, padding=2),
+            nn.Conv2d(3, 3, kernel_size=3, stride=1, padding=2),
             nn.PixelShuffle(1),
             nn.PReLU()
         )
-        self.out = nn.Conv2d(3, 3, kernel_size=4, stride=2, padding=1),
+        self.out = nn.Conv2d(3, 3, kernel_size=4, stride=2, padding=1)
+
     def forward(self, x):
         block0 = self.block0(x)
         block1 = self.block1(block0)
