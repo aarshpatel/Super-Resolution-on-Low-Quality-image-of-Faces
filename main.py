@@ -253,8 +253,8 @@ if __name__ == "__main__":
 	#################
 	train_mean = np.array([149.59638197, 114.21029544,  93.41318133])
 	train_std = np.array([52.54902009, 44.34252746, 42.88273568])
-	normalize = transforms.Normalize(mean=[mean for mean in train_mean],
-										std=[std for std in train_std])
+	normalize = transforms.Normalize(mean=[mean/255.0 for mean in train_mean],
+										std=[std/255.0 for std in train_std])
 
 	transform_normalize = transforms.Compose([
 		transforms.ToTensor(),
