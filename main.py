@@ -231,8 +231,7 @@ if __name__ == "__main__":
 																									opt.loss, opt.lr,
 																									opt.epochs,
 																									opt.batch_size)
-	print "Hyperparameters: "
-
+	print "\nHyperparameters: "
 	print "Model: ", opt.model
 	print "Method: ", method
 	print "Size: ", size
@@ -240,6 +239,7 @@ if __name__ == "__main__":
 	print "Learning Rate: ", lr
 	print "Epochs: ", num_epochs
 	print "Batch Size: ", batch_size
+	print "\n"
 
 	if grayscale:
 		image_color = "grayscale"
