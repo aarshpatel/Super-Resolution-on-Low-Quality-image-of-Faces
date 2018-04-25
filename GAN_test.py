@@ -427,10 +427,11 @@ if __name__ == "__main__":
             # UPDATING STATISTICS
             # ==================================================================
 
+
             # measure psnr and loss
             mse = loss_fn(fake_images, target)
-            psnr = calc_psnr(mse.data[0], input.size(0))
-            psnr_meter.update(psnr)
+            psnr = 10 * log10(1 / mse.data[0])
+            psnr_meter.update(psnr, input.size(0))
             losses_meter.update(lossG.data[0], input.size(0))
 
             # measure the time it takes to train for one epoch
