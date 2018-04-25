@@ -12,7 +12,7 @@ import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
-from models.resnet_subpixel_cnn import ResnetSubPixelCNN
+from models.resnet_subpixel_cnn_variant import ResnetSubPixelCNNVariant
 from models.discriminator_cnn import DiscriminatorCNN
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
@@ -76,9 +76,9 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.5) + (loss_fn2(outputs2,fake_labels)*.5)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.3) + (loss_fn2(outputs2,fake_labels)*.7)
         else:
-            lossG = (loss_fn(fake_images,target)*.5) + (loss_fn2(outputs2, fake_labels)*.5)
+            lossG = (loss_fn(fake_images,target)*.3) + (loss_fn2(outputs2, fake_labels)*.7)
 
         # Backprop + Optimize
         modelD.zero_grad()
@@ -103,7 +103,7 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         # PRINTING STATISTICS
         # ==================================================================
 
-        if iteration % 10 == 0:
+        if iteration % 500 == 0:
             print('Epoch [%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, iteration + 1, len(train_loader), lossD.data[0], lossG.data[0], real_score.data.mean(), fake_score.data.mean()))
 
             new_output_dir = "./images_from_runs/{0}/train/".format(model_name)
@@ -174,9 +174,9 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.5) + (loss_fn2(outputs2,fake_labels)*.5)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.3) + (loss_fn2(outputs2,fake_labels)*.7)
         else:
-            lossG = (loss_fn(fake_images,target)*.5) + (loss_fn2(outputs2, fake_labels)*.5)
+            lossG = (loss_fn(fake_images,target)*.3) + (loss_fn2(outputs2, fake_labels)*.7)
         # ==================================================================
         # UPDATING STATISTICS
         # ==================================================================
@@ -194,7 +194,7 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # PRINTING STATISTICS
         # ==================================================================
 
-        if iteration % 10 == 0:
+        if iteration % 100 == 0:
             print('Epoch [%d/%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, 200, iteration + 1, 600, lossD.data[0], lossG.data[0], real_score.data.mean(),fake_score.data.mean()))
 
             new_output_dir = "./images_from_runs/{0}/val/".format(model_name)
@@ -339,7 +339,7 @@ if __name__ == "__main__":
     # ============================
 
     # get the model Generative
-    modelG = ResnetSubPixelCNN()
+    modelG = ResnetSubPixelCNNVariant()
 
     # set the optimizer Generative
     optimizerG = optim.Adam(modelG.parameters(), lr=lr, weight_decay=weight_decay)
@@ -376,6 +376,73 @@ if __name__ == "__main__":
     for param in vgg_loss.parameters():
         param.requires_grad = False
 
+    batch_time_meter = AverageMeter()
+    losses_meter = AverageMeter()
+    psnr_meter = AverageMeter()
+    # setup the loss function (MSE/BCE)
+    loss_fn = nn.MSELoss().cuda()
+    loss_fn2 = nn.BCELoss().cuda()
+
+    # ==============================
+    # PRETRAINING GENERATIVE MODEL
+    # ==============================
+    for i in range(20):
+        # set the model to train mode
+        modelG.train()
+        start = time.time()
+        for iteration, batch in enumerate(train_loader, 1):
+            input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
+            # ==================================================================
+            # TRAINING THE DISCRIMINATIVE MODEL
+            # ==================================================================
+            input = input.cuda()
+            target = target.cuda()
+            real_labels = to_var(torch.ones(batch_size))
+            fake_labels = to_var(torch.zeros(batch_size))
+
+            # ==================================================================
+            # TRAINING THE GENERATIVE MODEL
+            # ==================================================================
+
+            fake_images = modelG(input)
+            if loss_type == "perceptual":
+                vgg_loss_output = vgg_loss(fake_images)
+                vgg_loss_target = vgg_loss(target)
+                lossG = (loss_fn(vgg_loss_output, vgg_loss_target))
+            else:
+                lossG = (loss_fn(fake_images, target))
+
+            # Backprop + Optimize
+            modelG.zero_grad()
+            lossG.backward()
+            optimizerG.step()
+            # ==================================================================
+            # UPDATING STATISTICS
+            # ==================================================================
+
+            # measure psnr and loss
+            mse = loss_fn(fake_images, target)
+            psnr = calc_psnr(mse.data[0], input.size(0))
+            psnr_meter.update(psnr)
+            losses_meter.update(lossG.data[0], input.size(0))
+
+            # measure the time it takes to train for one epoch
+            batch_time_meter.update(time.time() - start)
+            start = time.time()
+
+            # ==================================================================
+            # PRINTING STATISTICS
+            # ==================================================================
+            if iteration % 500 == 0:
+                print('Epoch: [{0}][{1}/{2}]\t'
+                      'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                      'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                      'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(i, iteration, len(train_loader),
+                                                                    batch_time=batch_time_meter, loss=losses_meter,
+                                                                    psnr=psnr_meter))
+    # ==============================
+    # DONE TRAINING GENERATIVE MODEL
+    # ==============================
     # =============================
     # RUNNING FORLOOP OVER EPOCHS
     # =============================
