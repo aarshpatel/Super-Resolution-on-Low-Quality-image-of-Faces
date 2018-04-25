@@ -223,7 +223,7 @@ if __name__ == "__main__":
 	num_workers = opt.threads
 	weight_decay = opt.weight_decay
 	grayscale = opt.grayscale
-	num_blocks = opt.num_blocks
+	num_convblocks = opt.num_convblocks
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
 																									opt.method,
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
 	# get the model
 	if opt.model == "BaselineCNNModel": 
-		model = BaselineCNNModel()
+		model = BaselineCNNModel(num_convblocks=num_convblocks)
 	elif opt.model == "ResnetSubPixelCNN":
 		model = ResnetSubPixelCNN()
 
