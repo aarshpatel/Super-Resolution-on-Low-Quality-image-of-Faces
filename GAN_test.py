@@ -76,9 +76,9 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/(epoch+1)) + (loss_fn2(outputs2,fake_labels) * .01 * (epoch+1 * epoch+1))
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/(epoch+1*epoch+1)) + (loss_fn2(outputs2,fake_labels) * .001 * (epoch+1 *epoch+1 * epoch+1))
         else:
-            lossG = (loss_fn(fake_images,target)*.9/(epoch+1)) + (loss_fn2(outputs2, fake_labels) * .01 *(epoch+1 * epoch+1))
+            lossG = (loss_fn(fake_images,target)*.9/(epoch+1*epoch+1)) + (loss_fn2(outputs2, fake_labels) * .001 *(epoch+1 * epoch+1 * epoch+1))
 
         # Backprop + Optimize
         modelD.zero_grad()
