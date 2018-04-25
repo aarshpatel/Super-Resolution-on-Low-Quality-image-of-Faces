@@ -231,7 +231,15 @@ if __name__ == "__main__":
 																									opt.loss, opt.lr,
 																									opt.epochs,
 																									opt.batch_size)
-	print "Hyperparameters: ", main_hyperparameters
+	print "Hyperparameters: "
+
+	print "Model: ", opt.model
+	print "Method: ", method
+	print "Size: ", size
+	print "Loss: ", loss_type
+	print "Learning Rate: ", lr
+	print "Epochs: ", num_epochs
+	print "Batch Size: ", batch_size
 
 	if grayscale:
 		image_color = "grayscale"
@@ -264,6 +272,8 @@ if __name__ == "__main__":
 	# get the model
 	if opt.model == "BaselineCNNModel": 
 		model = BaselineCNNModel(num_convblocks=num_convblocks)
+		print "The number of ConvBlocks to use in the BaselineCNNModel: ", num_convblocks
+
 	elif opt.model == "ResnetSubPixelCNN":
 		model = ResnetSubPixelCNN()
 
