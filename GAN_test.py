@@ -13,7 +13,7 @@ import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
 from models.resnet_subpixel_cnn import ResnetSubPixelCNN
-from models.three_layer_cnn_Disc import ThreeLayerCNNDisc
+from models.discriminator_cnn import DiscriminatorCNN
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
 from torchvision import models
@@ -46,7 +46,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         # ==================================================================
         # TRAINING THE DISCRIMINATIVE MODEL
         # ==================================================================
-
+        input = input.cuda()
+        target = target.cuda()
         real_labels = to_var(torch.ones(batch_size))
         fake_labels = to_var(torch.zeros(batch_size))
 
@@ -90,8 +91,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
 
         # measure psnr and loss
         mse = loss_fn(fake_images, target)
-        psnr = calc_psnr(mse.data[0])
-        psnr_meter.update(psnr, input.size(0))
+        psnr = calc_psnr(mse.data[0], input.size(0))
+        psnr_meter.update(psnr)
         losses_meter.update(lossG.data[0], input.size(0))
 
         # measure the time it takes to train for one epoch
@@ -102,8 +103,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         # PRINTING STATISTICS
         # ==================================================================
 
-        if iteration % 500 == 0:
-            print('Epoch [%d/%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, 200, iteration + 1, 600, lossD.data[0], lossG.data[0], real_score.data.mean(), fake_score.data.mean()))
+        if iteration % 10 == 0:
+            print('Epoch [%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, iteration + 1, len(train_loader), lossD.data[0], lossG.data[0], real_score.data.mean(), fake_score.data.mean()))
 
             new_output_dir = "./images_from_runs/{0}/train/".format(model_name)
 
@@ -148,7 +149,8 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # ==================================================================
         # EVALUATING THE DISCRIMINATIVE MODEL
         # ==================================================================
-
+        input = input.cuda()
+        target = target.cuda()
         real_labels = to_var(torch.ones(batch_size))
         fake_labels = to_var(torch.zeros(batch_size))
 
@@ -181,8 +183,8 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
 
         # compute the psnr and loss on the validation set
         mse = loss_fn(fake_images, target)
-        psnr = calc_psnr(mse.data[0])
-        psnr_meter.update(psnr, input.size(0))
+        psnr = calc_psnr(mse.data[0],input.size(0))
+        psnr_meter.update(psnr)
         losses_meter.update(lossG.data[0], input.size(0))
 
         # measure time
@@ -192,7 +194,7 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # PRINTING STATISTICS
         # ==================================================================
 
-        if iteration % 100 == 0:
+        if iteration % 10 == 0:
             print('Epoch [%d/%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, 200, iteration + 1, 600, lossD.data[0], lossG.data[0], real_score.data.mean(),fake_score.data.mean()))
 
             new_output_dir = "./images_from_runs/{0}/val/".format(model_name)
@@ -353,7 +355,7 @@ if __name__ == "__main__":
     # ============================
 
     # get the model Discriminative
-    modelD = ThreeLayerCNNDisc()
+    modelD = DiscriminatorCNN()
 
     # set the optimizer Discriminative
     optimizerD = optim.Adam(modelD.parameters(), lr=lr, weight_decay=weight_decay)
@@ -379,7 +381,7 @@ if __name__ == "__main__":
     # =============================
     for epoch in range(num_epochs):
         # trains the model for one epoch
-        train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch, vgg_loss, model_name=main_hyperparameters)
+        train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch, vgg_loss, model_name=main_hyperparametersG)
 
         # ==========================================================
         # evaluate on the validation set Generative

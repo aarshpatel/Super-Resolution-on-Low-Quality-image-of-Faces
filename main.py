@@ -57,9 +57,9 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
 
 		# measure psnr and loss
 		mse = loss_fn(output, target)
-		psnr = calc_psnr(mse.data[0])
+		psnr = calc_psnr(mse.data[0], input.size(0))
 		
-		psnr_meter.update(psnr, input.size(0))
+		psnr_meter.update(psnr)
 		losses_meter.update(loss.data[0], input.size(0))
 
 		# zero out the gradients
@@ -132,8 +132,8 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 
 		# compute the psnr and loss on the validation set
 		mse = loss_fn(output , target)
-		psnr = calc_psnr(mse.data[0])
-		psnr_meter.update(psnr, input.size(0))
+		psnr = calc_psnr(mse.data[0], input.size(0))
+		psnr_meter.update(psnr)
 		losses_meter.update(loss.data[0], input.size(0))
 
 		# measure time
@@ -223,7 +223,7 @@ if __name__ == "__main__":
 	num_workers = opt.threads
 	weight_decay = opt.weight_decay
 	grayscale = opt.grayscale
-	num_blocks = opt.num_convblocks
+	num_blocks = opt.num_blocks
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
 																									opt.method,
@@ -263,7 +263,7 @@ if __name__ == "__main__":
 
 	# get the model
 	if opt.model == "BaselineCNNModel": 
-		model = BaselineCNNModel(num_convblocks=num_blocks)
+		model = BaselineCNNModel()
 	elif opt.model == "ResnetSubPixelCNN":
 		model = ResnetSubPixelCNN()
 

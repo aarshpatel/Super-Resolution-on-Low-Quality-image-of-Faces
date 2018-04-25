@@ -35,8 +35,8 @@ def evaluate_on_test(model, test_loader, metric):
 		# compute the psnr and ssim on the test set
 		if "psnr" == metric:
 			mse = loss_fn(output, target)
-			psnr = calc_psnr(mse.data[0])
-			metric_meter.update(psnr, input.size(0))
+			psnr = calc_psnr(mse.data[0], input.size(0))
+			metric_meter.update(psnr)
 		elif "ssim" == metric:
 			ssim = calc_ssim(output.data.float().cpu().numpy(), target.data.float().cpu().numpy())
 			metric_meter.update(ssim, input.size(0))
