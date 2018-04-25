@@ -111,7 +111,7 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 	loss_fn = nn.MSELoss().cuda()
 
 	for iteration, batch in enumerate(val_loader, start=1):
-		input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
+		input, target = Variable(batch[0], volatile=True), Variable(batch[1], volatile=True)
 
 		# use the GPU
 		if use_cuda:
