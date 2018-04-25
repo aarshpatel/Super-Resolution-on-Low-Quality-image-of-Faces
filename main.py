@@ -59,7 +59,6 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
 		mse = loss_fn(output, target)
 		psnr = 10 * log10(1 / mse.data[0])
 		# psnr = calc_psnr(mse.data[0])
-		print "PSNR: ", psnr		
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
