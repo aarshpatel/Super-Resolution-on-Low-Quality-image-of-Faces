@@ -1,13 +1,15 @@
 import torch.nn as nn
 from conv_block import ConvBlock
 
-class ThreeLayerCNNBaseline(nn.Module):
+class BaselineCNNModel(nn.Module):
     """ 
     Simple three layer baseline that uses Conv Tranpose to upscale the image to the input image size 
+    Can take in a parameter called *num_convblocks* to specify the number of inner 
+    conv blocks to use 
     """
 
     def __init__(self, num_convblocks=1):
-        super(ThreeLayerCNNBaseline,self).__init__()
+        super(BaselineCNNModel,self).__init__()
 
         self.downsample = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=5, stride=1, padding=1), 
