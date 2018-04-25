@@ -73,7 +73,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
         batch_time_meter.update(time.time() - start)
         start = time.time()
 
-        if iteration % 500 == 0:
+        if iteration % 10 == 0:
 
             new_output_dir = "./images_from_runs/{0}/train/".format(model_name)
 
@@ -144,7 +144,7 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
         batch_time_meter.update(time.time() - start)
         start = time.time()
 
-        if iteration % 100 == 0:
+        if iteration % 10 == 0:
 
             new_output_dir = "./images_from_runs/{0}/val/".format(model_name)
 

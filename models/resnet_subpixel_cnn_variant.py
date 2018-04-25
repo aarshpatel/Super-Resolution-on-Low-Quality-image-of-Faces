@@ -9,7 +9,7 @@ class ResnetSubPixelCNNVariant(nn.Module):
         super(ResnetSubPixelCNNVariant,self).__init__()
         #Before First residual Block
         self.block0 = nn.Sequential(
-            nn.Conv2d(3, 128, kernel_size=9, stride=1, padding=4),
+            nn.Conv2d(3, 64, kernel_size=4, stride=2, padding=1),
             nn.PReLU()
         )
         self.block1 = ResidualBlock(64)
@@ -45,7 +45,7 @@ class ResnetSubPixelCNNVariant(nn.Module):
 class ResidualBlock(nn.Module):
     def __init__(self, N):
         super(ResidualBlock, self).__init__()
-        self.layer1 = nn.Conv2d(N, N,kernel_size=9, stride=1, padding=4)
+        self.layer1 = nn.Conv2d(N, N, kernel_size=9, stride=1, padding=4)
         self.layer2 = nn.BatchNorm2d(N)
         self.layer3 = nn.PReLU()
         self.layer4 = nn.Conv2d(N, N, kernel_size=9, stride=1, padding=4)
