@@ -264,6 +264,8 @@ if __name__ == "__main__":
 	# get the model
 	if opt.model == "BaselineCNNModel": 
 		model = BaselineCNNModel(num_convblocks=num_convblocks)
+		print "The number of ConvBlocks to use in the BaselineCNNModel: ", num_convblocks
+
 	elif opt.model == "ResnetSubPixelCNN":
 		model = ResnetSubPixelCNN()
 
