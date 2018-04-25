@@ -461,7 +461,7 @@ if __name__ == "__main__":
         # ==========================================================
         # evaluate on the validation set Generative
         # ==========================================================
-        val_lossG, val_lossD, val_psnr_avgG, = validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss,
+        val_lossG, val_lossD, val_psnr_avgG = validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss,
                                           model_name=main_hyperparametersG)
 
         # adjust the learning rate if val loss stops improving
@@ -479,5 +479,11 @@ if __name__ == "__main__":
             'epoch': epoch + 1,
             'state_dict': modelG.state_dict(),
             'best_psnr': best_avg_psnrG,
+        }, is_bestG)
+
+        save_checkpoint(main_hyperparametersD, {
+            'epoch': epoch + 1,
+            'state_dict': modelG.state_dict(),
+            'best_psnr': 0,
         }, is_bestG)
     print("Best PSNR on Gene the validation set: {}".format(best_avg_psnrG))
