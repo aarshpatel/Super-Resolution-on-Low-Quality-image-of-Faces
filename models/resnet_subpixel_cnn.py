@@ -7,20 +7,23 @@ class ResnetSubPixelCNN(nn.Module):
 
     def __init__(self):
         super(ResnetSubPixelCNN,self).__init__()
-        #Before First residual Block
         self.block0 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=4, stride=2, padding=1),
             nn.PReLU()
         )
+
+        # Residual Blocks
         self.block1 = ResidualBlock(64)
         self.block2 = ResidualBlock(64)
         self.block3 = ResidualBlock(64)
         self.block4 = ResidualBlock(64)
         self.block5 = ResidualBlock(64)
+
         self.block6 = nn.Sequential(
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
             nn.BatchNorm2d(64)
         )
+
         self.upsample = nn.Sequential(
             nn.Conv2d(64, 12, kernel_size=3, stride=1, padding=1),
             nn.PixelShuffle(2),

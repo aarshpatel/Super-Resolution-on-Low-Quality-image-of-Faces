@@ -14,7 +14,7 @@ import shutil
 import torchvision.utils as vutils
 from tensorboardX import SummaryWriter
 from dataset import ObfuscatedDatasetLoader
-from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
+from models.baseline_cnn_model import BaselineCNNModel 
 from models.resnet_subpixel_cnn import ResnetSubPixelCNN
 from scripts.metrics import calc_psnr
 from scripts.average_meter import AverageMeter
@@ -58,7 +58,7 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
 		# measure psnr and loss
 		mse = loss_fn(output, target)
 		psnr = calc_psnr(mse.data[0], input.size(0))
-
+		
 		psnr_meter.update(psnr)
 		losses_meter.update(loss.data[0], input.size(0))
 
@@ -132,8 +132,8 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 
 		# compute the psnr and loss on the validation set
 		mse = loss_fn(output , target)
-		psnr = calc_psnr(mse.data[0])
-		psnr_meter.update(psnr, input.size(0))
+		psnr = calc_psnr(mse.data[0], input.size(0))
+		psnr_meter.update(psnr)
 		losses_meter.update(loss.data[0], input.size(0))
 
 		# measure time
@@ -187,7 +187,7 @@ def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
-	parser.add_argument("--model", type=str, default="ThreeLayerCNNBaseline", help="type of model to use for facial reconstruction")
+	parser.add_argument("--model", type=str, default="BaselineCNNModel", help="type of model to use for facial reconstruction")
 	parser.add_argument("--method", type=str, default="blurred", help="type of obfuscation method to use")
 	parser.add_argument("--size", type=int, help="size of the obfuscation method applied to images")
 	parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
@@ -202,6 +202,8 @@ if __name__ == "__main__":
 	parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
 	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
 	parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
+	parser.add_argument('--num_convblocks', type=int, default=1, help="the number of convblocks to use in the BaselineCNNModel")
+
 	global opt, writer, best_avg_psnr
 	opt = parser.parse_args()
 
@@ -221,6 +223,7 @@ if __name__ == "__main__":
 	num_workers = opt.threads
 	weight_decay = opt.weight_decay
 	grayscale = opt.grayscale
+	num_convblocks = opt.num_convblocks
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
 																									opt.method,
@@ -259,8 +262,8 @@ if __name__ == "__main__":
 	val_loader = DataLoader(val_dset, shuffle=True, batch_size=batch_size, num_workers=num_workers)
 
 	# get the model
-	if opt.model == "ThreeLayerCNNBaseline": 
-		model = ThreeLayerCNNBaseline()
+	if opt.model == "BaselineCNNModel": 
+		model = BaselineCNNModel(num_convblocks=num_convblocks)
 	elif opt.model == "ResnetSubPixelCNN":
 		model = ResnetSubPixelCNN()
 
