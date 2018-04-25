@@ -134,7 +134,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
 def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name):
     """ Validate the model on the validation set """
     batch_time_meter = AverageMeter()
-    losses_meter = AverageMeter()
+    losses_meterG = AverageMeter()
+    losses_meterD = AverageMeter()
     psnr_meter = AverageMeter()
     loss_fn = nn.MSELoss().cuda()
     loss_fn2 = nn.BCELoss().cuda()
@@ -185,7 +186,8 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         mse = loss_fn(fake_images, target)
         psnr = calc_psnr(mse.data[0],input.size(0))
         psnr_meter.update(psnr)
-        losses_meter.update(lossG.data[0], input.size(0))
+        losses_meterG.update(lossG.data[0], input.size(0))
+        losses_meterD.update(lossD.data[0], input.size(0))
 
         # measure time
         batch_time_meter.update(time.time() - start)
@@ -222,7 +224,7 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         writer.add_scalar("PSNR/val", psnr_meter.avg, epoch)
         writer.add_scalar("Loss/val", losses_meter.avg, epoch)
 
-    return losses_meter.avg, psnr_meter.avg
+    return losses_meterG.avg, losses_meterD.avg, psnr_meter.avg
 
 
 class AverageMeter(object):
@@ -279,6 +281,7 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
     parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
     parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
+    parser.add_argument('--pre_pochs', type=int, default=5, help="number of epochs for pre-training Generator")
     global opt, writer, best_avg_psnr
     opt = parser.parse_args()
 
@@ -299,6 +302,7 @@ if __name__ == "__main__":
     num_workers = opt.threads
     weight_decay = opt.weight_decay
     grayscale = opt.grayscale
+    pre_epochs = opt.pre_pochs
 
     main_hyperparametersG = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
     print("Hyperparameters Gene: ", main_hyperparametersG)
@@ -386,7 +390,7 @@ if __name__ == "__main__":
     # ==============================
     # PRETRAINING GENERATIVE MODEL
     # ==============================
-    for i in range(5):
+    for i in range(pre_epochs):
         # set the model to train mode
         modelG.train()
         start = time.time()
@@ -453,17 +457,11 @@ if __name__ == "__main__":
         # ==========================================================
         # evaluate on the validation set Generative
         # ==========================================================
-        val_lossG, val_psnr_avgG = validate(val_loader, modelG, loss_type, epoch, vgg_loss,
+        val_lossG, val_lossD, val_psnr_avgG, = validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss,
                                           model_name=main_hyperparametersG)
 
         # adjust the learning rate if val loss stops improving
         schedulerG.step(val_lossG)
-
-        # ==========================================================
-        # evaluate on the validation set Discriminative
-        # ==========================================================
-        val_lossD, val_psnr_avgD = validate(val_loader, modelD, loss_type, epoch, vgg_loss,
-                                          model_name=main_hyperparametersD)
 
         # adjust the learning rate if val loss stops improving
         schedulerD.step(val_lossD)
@@ -478,14 +476,4 @@ if __name__ == "__main__":
             'state_dict': modelG.state_dict(),
             'best_psnr': best_avg_psnrG,
         }, is_bestG)
-
-        is_bestD = val_psnr_avgD > best_avg_psnrD
-        best_avg_psnrD = max(val_psnr_avgD, best_avg_psnrD)
-        save_checkpoint(main_hyperparametersD, {
-            'epoch': epoch + 1,
-            'state_dict': modelD.state_dict(),
-            'best_psnr': best_avg_psnrD,
-        }, is_bestD)
-
     print("Best PSNR on Gene the validation set: {}".format(best_avg_psnrG))
-    print("Best PSNR on Disc the validation set: {}".format(best_avg_psnrD))
