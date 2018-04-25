@@ -386,7 +386,7 @@ if __name__ == "__main__":
     # ==============================
     # PRETRAINING GENERATIVE MODEL
     # ==============================
-    for i in range(20):
+    for i in range(5):
         # set the model to train mode
         modelG.train()
         start = time.time()
