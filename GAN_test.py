@@ -281,7 +281,7 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
     parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
     parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
-    parser.add_argument('--pre_pochs', action="store_true", help="number of epochs for pre-training Generator")
+    parser.add_argument('--pre_pochs', type=int, default=5, help="number of epochs for pre-training Generator")
     global opt, writer, best_avg_psnr
     opt = parser.parse_args()
 
