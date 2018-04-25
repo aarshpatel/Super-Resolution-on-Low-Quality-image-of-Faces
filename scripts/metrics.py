@@ -9,6 +9,7 @@ def calc_ssim(img1, img2):
     """ Compute the structural similarity between two images (SSIM) """
     return compare_ssim(img1, img2, multichannel=True)
 
-def calc_psnr(mse,size):
+def calc_psnr(mse):
 	"""Calculate the psnr (Peak Signal Noise Ratio)"""
-	return (20.0 * log10(255.0)) - (10.0 * log10(mse/size))
+	return 20 * log10(255.0 / math.sqrt(mse))
+	# return (20.0 * log10(255.0)) - (10.0 * log10(mse/size))
