@@ -42,9 +42,9 @@ class ObfuscatedDatasetLoader(data.Dataset):
 			x_train = np.array(x_train)
 			y_train = np.array(y_train)
 
-			print("Dataset Type: ", data_type)
-			print(x_train.shape)
-			print(y_train.shape)
+			print "Dataset Type: ", data_type
+			print x_train.shape
+			print y_train.shape
 
 			return x_train, y_train
 
