@@ -17,7 +17,7 @@ from models.discriminator_cnn import DiscriminatorCNN
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
 from torchvision import models
-
+from math import log10
 
 def to_var(x):
     if torch.cuda.is_available():#utilize the gpu of the pc
@@ -91,8 +91,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
 
         # measure psnr and loss
         mse = loss_fn(fake_images, target)
-        psnr = calc_psnr(mse.data[0], input.size(0))
-        psnr_meter.update(psnr)
+        psnr = 10 * log10(1 / mse.data[0])
+        psnr_meter.update(psnr, input.size(0))
         losses_meter.update(lossG.data[0], input.size(0))
 
         # measure the time it takes to train for one epoch
@@ -183,11 +183,14 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # ==================================================================
 
         # compute the psnr and loss on the validation set
+
+        # measure psnr and loss
         mse = loss_fn(fake_images, target)
-        psnr = calc_psnr(mse.data[0],input.size(0))
-        psnr_meter.update(psnr)
+        psnr = 10 * log10(1 / mse.data[0])
+        psnr_meter.update(psnr, input.size(0))
         losses_meterG.update(lossG.data[0], input.size(0))
         losses_meterD.update(lossD.data[0], input.size(0))
+
 
         # measure time
         batch_time_meter.update(time.time() - start)
