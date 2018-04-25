@@ -34,7 +34,8 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
     model.train()
 
     # setup the loss function (MSE)
-    loss_fn = nn.MSELoss().cuda()
+
+    loss_fn = nn.MSELoss()
 
     start = time.time()
     for iteration, batch in enumerate(train_loader, 1):
@@ -42,8 +43,8 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
 
         # use the GPU
         if use_cuda:
-            input = input.cuda()
-            target = target.cuda()
+            input = input
+            target = target
 
         # compute output from CNN model
         output = model(input)
@@ -112,23 +113,23 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 
     start = time.time()
 
-    loss_fn = nn.MSELoss().cuda()
+    loss_fn = nn.MSELoss()
 
     for iteration, batch in enumerate(val_loader, start=1):
         input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
 
         # use the GPU
         if use_cuda:
-            input = input.cuda()
-            target = target.cuda()
+            input = input
+            target = target
 
         # compute output from CNN model
         output = model(input)
 
         # calculate the loss (pixel or perceptual)
         if loss_type == "perceptual":
-            vgg_loss_input = vgg_loss(output.cuda())
-            vgg_loss_target = vgg_loss(target.cuda())
+            vgg_loss_input = vgg_loss(output)
+            vgg_loss_target = vgg_loss(target)
             loss = loss_fn(vgg_loss_input, vgg_loss_target)
         else:
             loss = loss_fn(output, target)
@@ -279,13 +280,13 @@ if __name__ == "__main__":
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", patience=5)
 
     if use_cuda:
-        model = model.cuda()
+        model = model
 
     # Setup the VGG for Perceptual Los
     vgg_loss = None
     if loss_type == "perceptual":
         vgg16 = models.vgg16(pretrained=True).features
-        vgg16.cuda()
+        vgg16
         vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
 
         for param in vgg_loss.parameters():
