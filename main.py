@@ -58,7 +58,6 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
 		# measure psnr and loss
 		mse = loss_fn(output, target)
 		psnr = 10 * log10(1 / mse.data[0])
-		# psnr = calc_psnr(mse.data[0])
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
@@ -133,7 +132,6 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 		# compute the psnr and loss on the validation set
 		mse = loss_fn(output , target)
 		psnr = 10 * log10(1 / mse.data[0])
-		# psnr = calc_psnr(mse.data[0])
 		psnr_meter.update(psnr, input.size(0))
 		losses_meter.update(loss.data[0], input.size(0))
 
