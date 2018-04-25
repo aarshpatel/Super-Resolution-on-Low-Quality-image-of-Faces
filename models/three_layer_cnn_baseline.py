@@ -9,11 +9,10 @@ class ThreeLayerCNNBaseline(nn.Module):
     def __init__(self, num_convblocks=1):
         super(ThreeLayerCNNBaseline,self).__init__()
 
-        self.layer_1 = nn.Sequential(
+        self.downsample = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=5, stride=1, padding=1), 
             nn.MaxPool2d(2)
         )
-
         inner_cnn_blocks = [ConvBlock(64, 64) for _ in range(num_convblocks)]
         self.blocks = nn.Sequential(*inner_cnn_blocks)
 
@@ -21,7 +20,7 @@ class ThreeLayerCNNBaseline(nn.Module):
 
     def forward(self,x):
         # input => 3 * 110 * 110
-        out = self.layer_1(x) # 64 * 54 * 54
+        out = self.downsample(x) # 64 * 54 * 54
         out = self.blocks(out) # 64 * 54 * 54
         out = self.upsample(out) # 3 * 110 * 110
         return out
