@@ -152,8 +152,8 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # ==================================================================
         input = input.cuda()
         target = target.cuda()
-        real_labels = to_var(torch.ones(batch_size))
-        fake_labels = to_var(torch.zeros(batch_size))
+        real_labels = to_var(torch.ones(input.size(0)))
+        fake_labels = to_var(torch.zeros(input.size(0)))
 
         # Feed Discriminator GT images, and labels = REAL
         outputs = modelD(target)
