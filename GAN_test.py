@@ -46,7 +46,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         # ==================================================================
         # TRAINING THE DISCRIMINATIVE MODEL
         # ==================================================================
-
+        input = input.cuda()
+        target = target.cuda()
         real_labels = to_var(torch.ones(batch_size))
         fake_labels = to_var(torch.zeros(batch_size))
 
@@ -148,7 +149,8 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         # ==================================================================
         # EVALUATING THE DISCRIMINATIVE MODEL
         # ==================================================================
-
+        input = input.cuda()
+        target = target.cuda()
         real_labels = to_var(torch.ones(batch_size))
         fake_labels = to_var(torch.zeros(batch_size))
 
@@ -346,7 +348,7 @@ if __name__ == "__main__":
     schedulerG = optim.lr_scheduler.ReduceLROnPlateau(optimizerG, "min", patience=5)
 
     if use_cuda:
-        modelG = modelG
+        modelG = modelG.cuda()
 
     # ============================
     # DISCRIMINATIVE MODEL
@@ -362,13 +364,13 @@ if __name__ == "__main__":
     schedulerD = optim.lr_scheduler.ReduceLROnPlateau(optimizerD, "min", patience=5)
 
     if use_cuda:
-        modelD = modelD
+        modelD = modelD.cuda()
 
     # ==============================
     # VGG MODEL for PERCEPTUAL LOSS
     # ==============================
     vgg16 = models.vgg16(pretrained=True).features
-    vgg16
+    vgg16.cuda()
     vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
 
     for param in vgg_loss.parameters():
