@@ -281,6 +281,7 @@ if __name__ == "__main__":
     parser.add_argument('--seed', type=int, default=123, help='random seed to use. Default=123')
     parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
     parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
+    parser.add_argument('--pre_pochs', action="store_true", help="number of epochs for pre-training Generator")
     global opt, writer, best_avg_psnr
     opt = parser.parse_args()
 
@@ -301,6 +302,7 @@ if __name__ == "__main__":
     num_workers = opt.threads
     weight_decay = opt.weight_decay
     grayscale = opt.grayscale
+    pre_epochs = opt.pre_pochs
 
     main_hyperparametersG = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
     print("Hyperparameters Gene: ", main_hyperparametersG)
@@ -388,7 +390,7 @@ if __name__ == "__main__":
     # ==============================
     # PRETRAINING GENERATIVE MODEL
     # ==============================
-    for i in range(5):
+    for i in range(pre_epochs):
         # set the model to train mode
         modelG.train()
         start = time.time()
