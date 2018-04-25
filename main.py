@@ -231,7 +231,7 @@ if __name__ == "__main__":
 																									opt.loss, opt.lr,
 																									opt.epochs,
 																									opt.batch_size)
-	print "\nHyperparameters: "
+	print "Hyperparameters: "
 	print "Model: ", opt.model
 	print "Method: ", method
 	print "Size: ", size
@@ -250,9 +250,9 @@ if __name__ == "__main__":
 	# Normalization #
 	#################
 	train_mean = np.array([149.59638197, 114.21029544,  93.41318133])
-	train_std = np.array([1.0, 1.0, 1.0])
-	normalize = transforms.Normalize(mean=[mean/255.0 for mean in train_mean],
-										std=[std/255.0 for std in train_std])
+	train_std = np.array([52.54902009, 44.34252746, 42.88273568])
+	normalize = transforms.Normalize(mean=[mean for mean in train_mean],
+										std=[std for std in train_std])
 
 	transform_normalize = transforms.Compose([
 		transforms.ToTensor(),
@@ -280,8 +280,8 @@ if __name__ == "__main__":
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
-	# set the scheduler
-	scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, "min", patience=5)
+	# set the scheduler (decay the learning rate every 5 epochs by .1)
+	scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=.1) 
 
 	if use_cuda:
 		model = model.cuda()
