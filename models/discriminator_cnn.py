@@ -43,7 +43,8 @@ class DiscriminatorCNN(nn.Module):
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(512, 1024, kernel_size=1),
             nn.LeakyReLU(),
-            nn.Conv2d(1024, 1, kernel_size=1)
+            nn.Conv2d(1024, 1, kernel_size=1),
+            nn.Sigmoid()
         )
 
     def forward(self, x):
