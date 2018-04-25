@@ -76,9 +76,9 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.01) + (loss_fn2(outputs2,fake_labels)*.99)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/epoch) + (loss_fn2(outputs2,fake_labels) * .01 * epoch * epoch)
         else:
-            lossG = (loss_fn(fake_images,target)*.01) + (loss_fn2(outputs2, fake_labels)*.99)
+            lossG = (loss_fn(fake_images,target)*.9/epoch) + (loss_fn2(outputs2, fake_labels) * .01 * epoch * epoch)
 
         # Backprop + Optimize
         modelD.zero_grad()
@@ -175,9 +175,9 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.01) + (loss_fn2(outputs2,fake_labels)*.99)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/epoch) + (loss_fn2(outputs2,fake_labels) * .1 * epoch)
         else:
-            lossG = (loss_fn(fake_images,target)*.01) + (loss_fn2(outputs2, fake_labels)*.99)
+            lossG = (loss_fn(fake_images,target)*.9/epoch) + (loss_fn2(outputs2, fake_labels) * .1 * epoch)
         # ==================================================================
         # UPDATING STATISTICS
         # ==================================================================
