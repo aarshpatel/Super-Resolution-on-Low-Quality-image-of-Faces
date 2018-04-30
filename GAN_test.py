@@ -76,7 +76,7 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
             lossD = loss_fn2(outputs2, fake_labels)
 
         else:
@@ -180,7 +180,7 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
             lossD = loss_fn2(outputs2, fake_labels)
 
         else:
@@ -481,5 +481,4 @@ if __name__ == "__main__":
         # ==========================================================
         is_bestG= val_psnr_avgG > best_avg_psnrG
         save_checkpoint(main_hyperparametersG, epoch + 1, modelG, is_bestG)
-        save_checkpoint(main_hyperparametersD, epoch + 1, modelD, is_bestG)
     print("Best PSNR on Gene the validation set: {}".format(best_avg_psnrG))
