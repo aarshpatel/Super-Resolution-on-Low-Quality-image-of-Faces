@@ -19,7 +19,7 @@ class ResnetSubPixelCNNVariant(nn.Module):
         self.block5 = ResidualBlock(128)
         self.block6 = nn.Sequential(
             nn.Conv2d(128, 128, kernel_size=9, stride=1, padding=4),
-            nn.BatchNorm2d(64)
+            nn.BatchNorm2d(128)
         )
         self.upsample = nn.Sequential(
             nn.Conv2d(128, 12, kernel_size=9, stride=1, padding=4),
