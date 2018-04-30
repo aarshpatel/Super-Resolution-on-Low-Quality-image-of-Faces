@@ -132,8 +132,14 @@ def validate(val_loader, model, loss_type, epoch, model_name, vgg_loss=None):
 			vgg_loss_input = vgg_loss(output.cuda())
 			vgg_loss_target = vgg_loss(target.cuda())
 			loss = loss_fn(vgg_loss_input, vgg_loss_target)
-		else:
+		elif loss_type == "pixel":
 			loss = loss_fn(output, target)
+		elif loss_type == "pixel_perceptual":
+			vgg_loss_output = vgg_loss(output)
+			vgg_loss_target = vgg_loss(target)
+			perceptual_loss = loss_fn(vgg_loss_output, vgg_loss_target)
+			pixel_loss = loss_fn(output, target)
+			loss = (.5) * pixel_loss + perceptual_loss
 
 		# compute the psnr and loss on the validation set
 		mse = loss_fn(output , target)
@@ -294,7 +300,7 @@ if __name__ == "__main__":
 
 	# Setup the VGG for Perceptual Los
 	vgg_loss = None
-	if loss_type == "perceptual":
+	if loss_type == "perceptual" or loss_type == "pixel_perceptual":
 		vgg16 = models.vgg16(pretrained=True).features
 		vgg16.cuda()
 		vgg_loss = create_loss_model(vgg16, 8, use_cuda=True)
