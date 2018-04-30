@@ -54,13 +54,13 @@ if __name__ == "__main__":
         # normalize train_mean and train_std
         blurred = np.array(blurred)
         blurred = blurred.astype(float)
-        blurred = torch.from_numpy(blurred).type(torch.FloatTensor)
-        blurred = Variable(normalize(blurred)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
+        blurred = torch.from_numpy(blurred).type(torch.FloatTensor).unsqueeze_(0).transpose(3,1).transpose(3,2)
+        blurredT = Variable(normalize(blurred)).cuda()
         test_image = np.array(clean)
         test_image = test_image.astype(float)
-        test_image = torch.from_numpy(test_image).type(torch.FloatTensor)
-        test_image = Variable(normalize(test_image)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
-        output = model(blurred)
+        test_image = torch.from_numpy(test_image).type(torch.FloatTensor).unsqueeze_(0).transpose(3,1).transpose(3,2)
+        test_imageT = Variable(normalize(test_image)).cuda()
+        output = model(blurredT)
         save_image(input=blurred, output=output, target=test_image, filename=str(model_name) + "_Prediction.jpg")
     else:
         print("=> no checkpoint found at '{}'".format("saved_models/" + str(model_name) + "best_model.pth.tar"))
