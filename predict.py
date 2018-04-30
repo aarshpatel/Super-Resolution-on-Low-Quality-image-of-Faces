@@ -34,7 +34,7 @@ if __name__ == "__main__":
     model_name = opt.model
     use_cuda = opt.cuda
     test_image = opt.image
-    clean = Image.open(os.path(test_image))
+    clean = Image.open(test_image)
     blurred = apply_gaussian_blur(clean, radius=4)
     if os.path.isfile("/saved_models/" + str(model_name) + "best_model.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
