@@ -408,8 +408,8 @@ if __name__ == "__main__":
     # ==============================
     # PRETRAINING GENERATIVE MODEL
     # ==============================
-    modelG.train()
     for i in range(pre_epochs):
+        modelG.train()
         # set the model to train mode
         start = time.time()
         for iteration, batch in enumerate(train_loader, 1):
@@ -466,6 +466,13 @@ if __name__ == "__main__":
                       'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(i, iteration, len(train_loader),
                                                                     batch_time=batch_time_meter, loss=losses_meter,
                                                                     psnr=psnr_meter))
+    val_lossG, val_lossD, val_psnr_avgG = validate(val_loader, modelG, modelD, loss_type, 0, vgg_loss,
+                                                   model_name=main_hyperparametersG)
+
+    # adjust the learning rate if val loss stops improving
+    schedulerG.step(val_lossG)
+    is_bestG = val_psnr_avgG > best_avg_psnrG
+    save_checkpoint(main_hyperparametersG, 0 + 1, modelG, is_bestG)
     # ==============================
     # DONE TRAINING GENERATIVE MODEL
     # ==============================
