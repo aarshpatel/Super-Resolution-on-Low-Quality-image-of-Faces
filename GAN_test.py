@@ -76,19 +76,17 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            if epoch > 4:
-                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2,fake_labels) * .5)
-            else:
-                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, fake_labels))
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
+            lossD = loss_fn2(outputs2, fake_labels)
 
         else:
-            if epoch > 4:
-                lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, fake_labels) * .5)
-            else:
-                lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, fake_labels) * .001 * (epoch + 1 * epoch + 1))
+            lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
+            lossD = loss_fn2(outputs2, fake_labels)
 
         # Backprop + Optimize
         modelD.zero_grad()
+        lossD.backward()
+        optimizerD.step()
         modelG.zero_grad()
         lossG.backward()
         optimizerG.step()
@@ -182,9 +180,12 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/(epoch+1)) + (loss_fn2(outputs2,fake_labels) * .1 * (epoch+1))
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
+            lossD = loss_fn2(outputs2, fake_labels)
+
         else:
-            lossG = (loss_fn(fake_images,target)*.9/(epoch+1)) + (loss_fn2(outputs2, fake_labels) * .1 * (epoch+1))
+            lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, real_labels)* .01*(epoch+1))
+            lossD = loss_fn2(outputs2, fake_labels)
         # ==================================================================
         # UPDATING STATISTICS
         # ==================================================================
