@@ -448,7 +448,7 @@ if __name__ == "__main__":
             # ==================================================================
             # PRINTING STATISTICS
             # ==================================================================
-            if iteration % 500 == 0:
+            if iteration % 100 == 0:
                 print('Epoch: [{0}][{1}/{2}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
