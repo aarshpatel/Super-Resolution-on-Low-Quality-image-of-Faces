@@ -54,11 +54,11 @@ if __name__ == "__main__":
         # normalize train_mean and train_std
         blurred = np.array(blurred)
         blurred = blurred.astype(float)
-        blurred = torch.from_numpy(blurred)
+        blurred = torch.from_numpy(blurred).astype(float)
         blurred = Variable(normalize(blurred)).cuda()
         test_image = np.array(clean)
         test_image = test_image.astype(float)
-        test_image = torch.from_numpy(test_image)
+        test_image = torch.from_numpy(test_image).astype(float)
         test_image = Variable(normalize(test_image)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
         output = model(blurred.unsqueeze_(0).transpose(3,1).transpose(3,2))
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
