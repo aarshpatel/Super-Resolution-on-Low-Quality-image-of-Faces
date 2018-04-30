@@ -62,7 +62,7 @@ if __name__ == "__main__":
         test_image = Variable(normalize(test_image)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
         output = model(blurred)
         input = blurred.data.squeeze().transpose(2,1).transpose(2,0)
-        output = output.data.squeeze().transpose(2,1).transpose(2,0)
+        output = output.data.squeeze().transposed(2,1).transpose(2,0)
         target = test_image.data.squeeze().transpose(2,1).transpose(2,0)
         save_image(input=input, output=output, target=target, filename=str(model_name) + "Prediction.jpg")
     else:
