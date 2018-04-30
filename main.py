@@ -186,15 +186,21 @@ def save_image(input, output, target, filename):
 	all_images = torch.cat((input, output, target))
 	vutils.save_image(all_images, filename=filename, normalize=True)
 
-def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(name, epoch, model, is_best, filename='checkpoint.pth.tar'):
     """Saves model checkpoint to disk"""
     directory = "saved_models/%s/" % (name)
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename = directory + filename
-    torch.save(state, filename)
+    torch.save(model, filename)
     if is_best:
         shutil.copyfile(filename, 'saved_models/%s/' % (name) + 'model_best.pth.tar')
+
+def save_model_val_psnr(model, val_psnr):
+	""" Save the model psnr values during training to an output file """
+	with open("val_psnr_scores/{}.txt".format(model), "w") as f:
+		for psnr in val_psnr:
+			f.write(str(psnr) + "\n")
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Facial Reconstruction using CNNs')
@@ -313,6 +319,8 @@ if __name__ == "__main__":
 		for param in vgg_loss.parameters():
 			param.requires_grad = False
 
+	val_psnrs = []
+
 	for epoch in range(num_epochs):
 
 		# trains the model for one epoch
@@ -321,16 +329,18 @@ if __name__ == "__main__":
 		# evaluate on the validation set
 		val_loss, val_psnr_avg = validate(val_loader, model, loss_type, epoch, model_name=main_hyperparameters, vgg_loss=vgg_loss)
 
+		val_psnrs.append(val_psnr_avg)
+
 		# adjust the learning rate if val loss stops improving
 		scheduler.step(val_loss)
 
 		# remember the best psnr value and save the checkpoint model
 		is_best = val_psnr_avg > best_avg_psnr
 		best_avg_psnr = max(val_psnr_avg, best_avg_psnr)
-		save_checkpoint(main_hyperparameters, {
-			'epoch': epoch + 1,
-			'state_dict': model.state_dict(),
-			'best_psnr': best_avg_psnr,
-		}, is_best)
+
+		save_checkpoint(main_hyperparameters, epoch+1, model, is_best)
+
+	# save the val psnr to a file
+	save_model_val_psnr(main_hyperparameters, val_psnrs)
 
 	print("Best PSNR on the validation set: {}".format(best_avg_psnr))
