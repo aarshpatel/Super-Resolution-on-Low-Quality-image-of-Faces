@@ -45,7 +45,8 @@ if __name__ == "__main__":
         model = baseline_cnn_model.BaselineCNNModel()
         state_dict = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
         print "here"
-        print state_dict
+        for item in state_dict.items:
+            print item
         print state_dict["state_dict"]
         new_state_dict = OrderedDict()
         for k, v in state_dict.items():
