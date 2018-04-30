@@ -325,10 +325,10 @@ if __name__ == "__main__":
     grayscale = opt.grayscale
     pre_epochs = opt.pre_pochs
 
-    main_hyperparametersG = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format("GenerativeADV", opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
+    main_hyperparametersG = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format("Generative", opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
     print("Hyperparameters Gene: ", main_hyperparametersG)
 
-    main_hyperparametersD = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format("DiscriminativeADV", opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
+    main_hyperparametersD = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format("Discriminative", opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
     print("Hyperparameters Disc: ", main_hyperparametersD)
 
     if grayscale:
@@ -412,8 +412,8 @@ if __name__ == "__main__":
     # PRETRAINING GENERATIVE MODEL
     # ==============================
     for i in range(pre_epochs):
-        modelG.train()
         # set the model to train mode
+        modelG.train()
         start = time.time()
         for iteration, batch in enumerate(train_loader, 1):
             input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
@@ -422,6 +422,8 @@ if __name__ == "__main__":
             # ==================================================================
             input = input.cuda()
             target = target.cuda()
+            real_labels = to_var(torch.ones(batch_size))
+            fake_labels = to_var(torch.zeros(batch_size))
 
             # ==================================================================
             # TRAINING THE GENERATIVE MODEL
@@ -432,10 +434,6 @@ if __name__ == "__main__":
                 vgg_loss_output = vgg_loss(fake_images)
                 vgg_loss_target = vgg_loss(target)
                 lossG = (loss_fn(vgg_loss_output, vgg_loss_target))
-            elif loss_type == "both":
-                vgg_loss_output = vgg_loss(fake_images)
-                vgg_loss_target = vgg_loss(target)
-                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn(fake_images, target) *.5)
             else:
                 lossG = (loss_fn(fake_images, target))
 
@@ -450,7 +448,7 @@ if __name__ == "__main__":
 
             # measure psnr and loss
             mse = loss_fn(fake_images, target)
-            psnr = 10 * log10(255/ mse.data[0])
+            psnr = 10 * log10(1 / mse.data[0])
             psnr_meter.update(psnr, input.size(0))
             losses_meter.update(lossG.data[0], input.size(0))
 
@@ -461,20 +459,13 @@ if __name__ == "__main__":
             # ==================================================================
             # PRINTING STATISTICS
             # ==================================================================
-            if iteration % 50 == 0:
+            if iteration % 100 == 0:
                 print('Epoch: [{0}][{1}/{2}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                       'PSNR {psnr.val:.3f} ({psnr.avg:.3f})'.format(i, iteration, len(train_loader),
                                                                     batch_time=batch_time_meter, loss=losses_meter,
                                                                     psnr=psnr_meter))
-    val_lossG, val_lossD, val_psnr_avgG = validate(val_loader, modelG, modelD, loss_type, 0, vgg_loss,
-                                                   model_name=main_hyperparametersG)
-
-    # adjust the learning rate if val loss stops improving
-    schedulerG.step(val_lossG)
-    is_bestG = val_psnr_avgG > best_avg_psnrG
-    save_checkpoint(main_hyperparametersG, 0 + 1, modelG, is_bestG)
     # ==============================
     # DONE TRAINING GENERATIVE MODEL
     # ==============================
@@ -501,5 +492,16 @@ if __name__ == "__main__":
         # remember the best psnr value and save the checkpoint model
         # ==========================================================
         is_bestG= val_psnr_avgG > best_avg_psnrG
-        save_checkpoint(main_hyperparametersG, epoch + 1, modelG, is_bestG)
+        best_avg_psnrG = max(val_psnr_avgG, best_avg_psnrG)
+        save_checkpoint(main_hyperparametersG, {
+            'epoch': epoch + 1,
+            'state_dict': modelG.state_dict(),
+            'best_psnr': best_avg_psnrG,
+        }, is_bestG)
+
+        save_checkpoint(main_hyperparametersD, {
+            'epoch': epoch + 1,
+            'state_dict': modelG.state_dict(),
+            'best_psnr': 0,
+        }, is_bestG)
     print("Best PSNR on Gene the validation set: {}".format(best_avg_psnrG))
