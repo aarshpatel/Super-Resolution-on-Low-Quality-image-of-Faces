@@ -314,7 +314,7 @@ if __name__ == "__main__":
     grayscale = opt.grayscale
     pre_epochs = opt.pre_pochs
 
-    main_hyperparametersG = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model, opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
+    main_hyperparametersG = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format("Generative", opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
     print("Hyperparameters Gene: ", main_hyperparametersG)
 
     main_hyperparametersD = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format("Discriminative", opt.method, opt.size, opt.loss, opt.lr, opt.epochs, opt.batch_size)
