@@ -86,8 +86,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
             lossD += loss_fn2(outputs2, fake_labels)
 
         # Backprop + Optimize
-        modelD.zero_grad()
-        modelG.zero_grad()
+        optimizerD.zero_grad()
+        optimizerG.zero_grad()
         lossD.backward()
         lossG.backward()
         optimizerD.step()
