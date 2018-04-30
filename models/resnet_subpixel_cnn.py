@@ -5,19 +5,15 @@ class ResnetSubPixelCNN(nn.Module):
     A model that uses ResNets and Subpixel convolution to reconstruct blurry facial images
     """
 
-    def __init__(self):
+    def __init__(self, num_resnet_blocks=5):
         super(ResnetSubPixelCNN,self).__init__()
         self.block0 = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=4, stride=2, padding=1),
             nn.PReLU()
         )
 
-        # Residual Blocks
-        self.block1 = ResidualBlock(64)
-        self.block2 = ResidualBlock(64)
-        self.block3 = ResidualBlock(64)
-        self.block4 = ResidualBlock(64)
-        self.block5 = ResidualBlock(64)
+        resnet_blocks = [ResidualBlock(64) for _ in range(num_resnet_blocks)]
+        self.residual_blocks = nn.Sequential(*resnet_blocks)
 
         self.block6 = nn.Sequential(
             nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),

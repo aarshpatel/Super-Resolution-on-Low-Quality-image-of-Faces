@@ -202,6 +202,7 @@ if __name__ == "__main__":
 	parser.add_argument('--tensorboard', action="store_true", help="use tensorboard for visualization?")
 	parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
 	parser.add_argument('--num_convblocks', type=int, default=1, help="the number of convblocks to use in the BaselineCNNModel")
+	parser.add_argument('--resnet_blocks', type=int, default=5, help="the number of resnet blocks to use the ResnetSubpixelCNN model")
 
 	global opt, writer, best_avg_psnr
 	opt = parser.parse_args()
@@ -223,6 +224,7 @@ if __name__ == "__main__":
 	weight_decay = opt.weight_decay
 	grayscale = opt.grayscale
 	num_convblocks = opt.num_convblocks
+	resnet_blocks = opt.resnet_blocks
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
 																									opt.method,
@@ -272,10 +274,9 @@ if __name__ == "__main__":
 	if opt.model == "BaselineCNNModel": 
 		model = BaselineCNNModel(num_convblocks=num_convblocks)
 		print "The number of ConvBlocks to use in the BaselineCNNModel: ", num_convblocks
-
 	elif opt.model == "ResnetSubPixelCNN":
-		model = ResnetSubPixelCNN()
-
+		model = ResnetSubPixelCNN(num_resnet_blocks=resnet_blocks)
+		print "The number of Resnet blocks to use in the ResnetSubPixelCNN model: ", resnet_blocks
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
@@ -306,7 +307,7 @@ if __name__ == "__main__":
 		# adjust the learning rate if val loss stops improving
 		scheduler.step(val_loss)
 
-			# remember the best psnr value and save the checkpoint model
+		# remember the best psnr value and save the checkpoint model
 		is_best = val_psnr_avg > best_avg_psnr
 		best_avg_psnr = max(val_psnr_avg, best_avg_psnr)
 		save_checkpoint(main_hyperparameters, {
