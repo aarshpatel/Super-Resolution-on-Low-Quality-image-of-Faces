@@ -36,9 +36,9 @@ if __name__ == "__main__":
     test_image = opt.image
     clean = Image.open(test_image)
     blurred = apply_gaussian_blur(clean, radius=4)
-    if os.path.isfile("/saved_models/" + str(model_name) + "best_model.pth.tar"):
+    if os.path.isfile("saved_models/" + str(model_name) + "best_model.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
-        test_model = torch.load("/saved_models/" + str(model_name) + "best_model.pth.tar")
+        test_model = torch.load("saved_models/" + str(model_name) + "best_model.pth.tar")
         test_model.cuda()
         test_model.eval()
         output = test_model(blurred)
@@ -46,4 +46,4 @@ if __name__ == "__main__":
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Ground_truth__" + str(test_image))
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Blurred__" + str(blurred))
     else:
-        print("=> no checkpoint found at '{}'".format("/saved_models/" + str(model_name) + "best_model.pth.tar"))
+        print("=> no checkpoint found at '{}'".format("saved_models/" + str(model_name) + "best_model.pth.tar"))
