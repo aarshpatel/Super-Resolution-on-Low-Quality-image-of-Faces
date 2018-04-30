@@ -34,7 +34,7 @@ if __name__ == "__main__":
     model_name = opt.model
     use_cuda = opt.cuda
     test_image = opt.image
-    directory = os.listdir("data/lfw_preprocessed/cropped_rgb/test")
+    directory = os.path.dirname("data/lfw_preprocessed/cropped_rgb/test")
     clean = Image.open(os.path.join(directory,test_image))
     blurred = apply_gaussian_blur(clean, radius=4)
     if os.path.isfile("saved_models/" + str(model_name) + "best_model.pth.tar"):
