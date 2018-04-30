@@ -438,7 +438,7 @@ if __name__ == "__main__":
                 lossG = (loss_fn(fake_images, target))
 
             # Backprop + Optimize
-            modelG.zero_grad()
+            optimizerG.zero_grad()
             lossG.backward()
             optimizerG.step()
             # ==================================================================
