@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
         checkpoint = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
-        model = resnet_subpixel_cnn.ResnetSubPixelCNN()
+        model = resnet_subpixel_cnn.ResnetSubPixelCNN(num_resnet_blocks=5)
         model.load_state_dict(checkpoint['state_dict'])
         model.cuda()
         output = model(blurred)
