@@ -76,16 +76,16 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            if epoch > 10:
-                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.6) + (loss_fn2(outputs2,fake_labels) * .4)
+            if epoch > 4:
+                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2,fake_labels) * .5)
             else:
-                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/(epoch+1*epoch+1)) + (loss_fn2(outputs2, fake_labels) * .001 *(epoch+1 * epoch+1))
+                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, fake_labels))
 
         else:
-            if epoch > 10:
-                lossG = (loss_fn(fake_images,target) * .6) + (loss_fn2(outputs2, fake_labels) * .4)
+            if epoch > 4:
+                lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, fake_labels) * .5)
             else:
-                lossG = (loss_fn(fake_images,target) * .9 / (epoch + 1 * epoch + 1)) + (loss_fn2(outputs2, fake_labels) * .001 * (epoch + 1 * epoch + 1))
+                lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, fake_labels) * .001 * (epoch + 1 * epoch + 1))
 
         # Backprop + Optimize
         modelD.zero_grad()
@@ -110,7 +110,7 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         # PRINTING STATISTICS
         # ==================================================================
 
-        if iteration % 500 == 0:
+        if iteration % 50 == 0:
             print('Epoch [%d], Step[%d/%d], d_loss: %.4f, ''g_loss: %.4f, D(x): %.2f, D(G(z)): %.2f' % (epoch, iteration + 1, len(train_loader), lossD.data[0], lossG.data[0], real_score.data.mean(), fake_score.data.mean()))
 
             new_output_dir = "./images_from_runs/{0}/train/".format(model_name)
@@ -400,9 +400,9 @@ if __name__ == "__main__":
     # ==============================
     # PRETRAINING GENERATIVE MODEL
     # ==============================
+    modelG.train()
     for i in range(pre_epochs):
         # set the model to train mode
-        modelG.train()
         start = time.time()
         for iteration, batch in enumerate(train_loader, 1):
             input, target = Variable(batch[0]), Variable(batch[1], requires_grad=False)
@@ -411,8 +411,6 @@ if __name__ == "__main__":
             # ==================================================================
             input = input.cuda()
             target = target.cuda()
-            real_labels = to_var(torch.ones(batch_size))
-            fake_labels = to_var(torch.zeros(batch_size))
 
             # ==================================================================
             # TRAINING THE GENERATIVE MODEL
@@ -448,7 +446,7 @@ if __name__ == "__main__":
             # ==================================================================
             # PRINTING STATISTICS
             # ==================================================================
-            if iteration % 100 == 0:
+            if iteration % 50 == 0:
                 print('Epoch: [{0}][{1}/{2}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
