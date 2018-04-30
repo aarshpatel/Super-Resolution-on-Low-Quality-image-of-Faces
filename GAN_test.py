@@ -87,10 +87,10 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
 
         # Backprop + Optimize
         modelD.zero_grad()
-        lossD.backward()
-        optimizerD.step()
         modelG.zero_grad()
+        lossD.backward()
         lossG.backward()
+        optimizerD.step()
         optimizerG.step()
         # ==================================================================
         # UPDATING STATISTICS
