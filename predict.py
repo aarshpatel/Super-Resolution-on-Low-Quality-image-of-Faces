@@ -8,7 +8,6 @@ import numpy as np
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 
-
 def save_image(input, output, target, filename):
     """ Save the input, output, target image during training """
     all_images = torch.cat((input, output, target))
@@ -37,9 +36,6 @@ if __name__ == "__main__":
         model = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
         model.cuda()
 
-        # convert to pytorch tensor
-
-        # convert variable
 
         # convert to cuda
         train_mean = np.array([149.59638197, 114.21029544, 93.41318133])
@@ -54,16 +50,12 @@ if __name__ == "__main__":
         # normalize train_mean and train_std
         blurred = np.array(blurred)
         blurred = blurred.astype(float)
-        blurred = torch.from_numpy(blurred).type(torch.FloatTensor)
-        blurred = Variable(normalize(blurred)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
-        test_image = np.array(clean)
-        test_image = test_image.astype(float)
-        test_image = torch.from_numpy(test_image).type(torch.FloatTensor)
-        test_image = Variable(normalize(test_image)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
-        output = model(blurred)
-        input = blurred.data.squeeze().transpose(2,1).transpose(2,0)
-        output = output.data.squeeze().transposed(2,1).transpose(2,0)
-        target = test_image.data.squeeze().transpose(2,1).transpose(2,0)
-        save_image(input=input, output=output, target=target, filename=str(model_name) + "Prediction.jpg")
+        blurred = torch.from_numpy(blurred).type(torch.FloatTensor) 
+        blurred = Variable(normalize(blurred)) 
+        blurred.cuda()
+        print "Blurred Input: ", blurred.size() 
+        # blurred = .cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
+        # input = blurred.data.squeeze().transpose(2,1).transpose(2,0)
+        # save_image(input=input, output=output, target=target, filename=str(model_name) + "Prediction.jpg")
     else:
         print("=> no checkpoint found at '{}'".format("saved_models/" + str(model_name) + "best_model.pth.tar"))
