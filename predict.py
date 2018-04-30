@@ -36,7 +36,7 @@ if __name__ == "__main__":
     test_image = opt.image
     clean = Image.open(test_image)
     blurred = apply_gaussian_blur(clean, radius=4)
-    if os.path.isfile("saved_models/" + str(model_name) + "best_model.pth.tar"):
+    if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
         test_model = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
         test_model.cuda()
