@@ -12,9 +12,7 @@ from torch.autograd import Variable
 def save_image(input, output, target, filename):
     """ Save the input, output, target image during training """
     all_images = torch.cat((input, output, target))
-    f = open(filename,"w+")
-    f.close()
-    vutils.save_image(all_images, filename=filename, normalize=True)
+    vutils.save_image(all_images, filename="saved_models/" + filename, normalize=True)
 
 def apply_gaussian_blur(img, radius):
     """ Apply gaussian blur to an image """
