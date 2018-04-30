@@ -17,7 +17,7 @@ from models.discriminator_cnn import DiscriminatorCNN
 from scripts.metrics import calc_psnr
 from loss import create_loss_model
 from torchvision import models
-
+from math import log10
 
 def to_var(x):
     if torch.cuda.is_available():#utilize the gpu of the pc
@@ -76,9 +76,16 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.3) + (loss_fn2(outputs2,fake_labels)*.7)
+            if epoch > 10:
+                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.7) + (loss_fn2(outputs2,fake_labels) * .3)
+            else:
+                lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/(epoch+1*epoch+1)) + (loss_fn2(outputs2, fake_labels) * .001 *(epoch+1 * epoch+1))
+
         else:
-            lossG = (loss_fn(fake_images,target)*.3) + (loss_fn2(outputs2, fake_labels)*.7)
+            if epoch > 10:
+                lossG = (loss_fn(fake_images,target) * .7) + (loss_fn2(outputs2, fake_labels) * .3)
+            else:
+                lossG = (loss_fn(fake_images,target) * .9 / (epoch + 1 * epoch + 1)) + (loss_fn2(outputs2, fake_labels) * .001 * (epoch + 1 * epoch + 1))
 
         # Backprop + Optimize
         modelD.zero_grad()
@@ -91,8 +98,8 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
 
         # measure psnr and loss
         mse = loss_fn(fake_images, target)
-        psnr = calc_psnr(mse.data[0], input.size(0))
-        psnr_meter.update(psnr)
+        psnr = 10 * log10(1 / mse.data[0])
+        psnr_meter.update(psnr, input.size(0))
         losses_meter.update(lossG.data[0], input.size(0))
 
         # measure the time it takes to train for one epoch
@@ -175,19 +182,22 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
         if loss_type == "perceptual":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
-            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.3) + (loss_fn2(outputs2,fake_labels)*.7)
+            lossG = (loss_fn(vgg_loss_output, vgg_loss_target)*.9/(epoch+1)) + (loss_fn2(outputs2,fake_labels) * .1 * (epoch+1))
         else:
-            lossG = (loss_fn(fake_images,target)*.3) + (loss_fn2(outputs2, fake_labels)*.7)
+            lossG = (loss_fn(fake_images,target)*.9/(epoch+1)) + (loss_fn2(outputs2, fake_labels) * .1 * (epoch+1))
         # ==================================================================
         # UPDATING STATISTICS
         # ==================================================================
 
         # compute the psnr and loss on the validation set
+
+        # measure psnr and loss
         mse = loss_fn(fake_images, target)
-        psnr = calc_psnr(mse.data[0],input.size(0))
-        psnr_meter.update(psnr)
+        psnr = 10 * log10(1 / mse.data[0])
+        psnr_meter.update(psnr, input.size(0))
         losses_meterG.update(lossG.data[0], input.size(0))
         losses_meterD.update(lossD.data[0], input.size(0))
+
 
         # measure time
         batch_time_meter.update(time.time() - start)
@@ -424,10 +434,11 @@ if __name__ == "__main__":
             # UPDATING STATISTICS
             # ==================================================================
 
+
             # measure psnr and loss
             mse = loss_fn(fake_images, target)
-            psnr = calc_psnr(mse.data[0], input.size(0))
-            psnr_meter.update(psnr)
+            psnr = 10 * log10(1 / mse.data[0])
+            psnr_meter.update(psnr, input.size(0))
             losses_meter.update(lossG.data[0], input.size(0))
 
             # measure the time it takes to train for one epoch
@@ -457,7 +468,7 @@ if __name__ == "__main__":
         # ==========================================================
         # evaluate on the validation set Generative
         # ==========================================================
-        val_lossG, val_lossD, val_psnr_avgG, = validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss,
+        val_lossG, val_lossD, val_psnr_avgG = validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss,
                                           model_name=main_hyperparametersG)
 
         # adjust the learning rate if val loss stops improving
@@ -475,5 +486,11 @@ if __name__ == "__main__":
             'epoch': epoch + 1,
             'state_dict': modelG.state_dict(),
             'best_psnr': best_avg_psnrG,
+        }, is_bestG)
+
+        save_checkpoint(main_hyperparametersD, {
+            'epoch': epoch + 1,
+            'state_dict': modelG.state_dict(),
+            'best_psnr': 0,
         }, is_bestG)
     print("Best PSNR on Gene the validation set: {}".format(best_avg_psnrG))
