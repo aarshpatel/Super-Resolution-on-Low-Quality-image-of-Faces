@@ -60,7 +60,7 @@ if __name__ == "__main__":
         test_image = test_image.astype(float)
         test_image = torch.from_numpy(test_image).type(torch.FloatTensor)
         test_image = Variable(normalize(test_image)).cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
-        output = Variable(model(blurred.unsqueeze_(0).transpose(3,1).transpose(3,2)))
+        output = Variable(model(blurred.unsqueeze_(0)))
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
     else:
         print("=> no checkpoint found at '{}'".format("saved_models/" + str(model_name) + "best_model.pth.tar"))
