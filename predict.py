@@ -14,6 +14,9 @@ import os
 import torchvision.utils as vutils
 from PIL import Image, ImageFilter
 from models import resnet_subpixel_cnn
+from collections import OrderedDict
+
+
 def save_image(input, output, target, filename):
     """ Save the input, output, target image during training """
     all_images = torch.cat((input, output, target))
@@ -39,10 +42,14 @@ if __name__ == "__main__":
     blurred = apply_gaussian_blur(clean, radius=4)
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
-        checkpoint = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
+        state_dict = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
         model = resnet_subpixel_cnn.ResnetSubPixelCNN(num_resnet_blocks=5)
-        print checkpoint['state_dict']
-        model.load_state_dict(checkpoint['state_dict'])
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            name = k[7:]  # remove `module.`
+            new_state_dict[name] = v
+        # load params
+        model.load_state_dict(new_state_dict)
         model.cuda()
         output = model(blurred)
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
