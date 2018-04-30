@@ -60,4 +60,4 @@ if __name__ == "__main__":
         vutils.save_image(output.data.float(), filename="saved_models/" + str(model_name) + "prediction.jpg", normalize=True)
         # save_image(input=input, output=output, target=target, filename=str(model_name) + "Prediction.jpg")
     else:
-        print("=> no checkpoint found at '{}'".format("saved_models/" + )
+        print "no checkpoint found..."
