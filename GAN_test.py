@@ -491,15 +491,5 @@ if __name__ == "__main__":
         # ==========================================================
         is_bestG= val_psnr_avgG > best_avg_psnrG
         best_avg_psnrG = max(val_psnr_avgG, best_avg_psnrG)
-        save_checkpoint(main_hyperparametersG, {
-            'epoch': epoch + 1,
-            'state_dict': modelG.state_dict(),
-            'best_psnr': best_avg_psnrG,
-        }, is_bestG)
-
-        save_checkpoint(main_hyperparametersD, {
-            'epoch': epoch + 1,
-            'state_dict': modelG.state_dict(),
-            'best_psnr': 0,
-        }, is_bestG)
+        save_checkpoint(main_hyperparametersG, epoch + 1, modelG, is_bestG)
     print("Best PSNR on Gene the validation set: {}".format(best_avg_psnrG))
