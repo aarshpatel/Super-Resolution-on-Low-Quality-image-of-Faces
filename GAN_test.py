@@ -262,13 +262,13 @@ def save_image(input, output, target, filename):
     vutils.save_image(all_images, filename=filename, normalize=True)
 
 
-def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(name, epoch, model, is_best, filename='checkpoint.pth.tar'):
     """Saves model checkpoint to disk"""
     directory = "saved_models/%s/" % (name)
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename = directory + filename
-    torch.save(state, filename)
+    torch.save(model, filename)
     if is_best:
         shutil.copyfile(filename, 'saved_models/%s/' % (name) + 'model_best.pth.tar')
 
@@ -448,7 +448,7 @@ if __name__ == "__main__":
             # ==================================================================
             # PRINTING STATISTICS
             # ==================================================================
-            if iteration % 500 == 0:
+            if iteration % 100 == 0:
                 print('Epoch: [{0}][{1}/{2}]\t'
                       'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
