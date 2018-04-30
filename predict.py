@@ -39,7 +39,6 @@ if __name__ == "__main__":
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
         checkpoint = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
-        best_prec1 = checkpoint['best_prec1']
         model = resnet_subpixel_cnn.ResnetSubPixelCNN()
         model.load_state_dict(checkpoint['state_dict'])
         model.cuda()
