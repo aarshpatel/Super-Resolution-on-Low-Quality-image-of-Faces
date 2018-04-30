@@ -43,7 +43,10 @@ if __name__ == "__main__":
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
         model = baseline_cnn_model.BaselineCNNModel()
-        state_dict = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")["state_dict"]
+        state_dict = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
+        print "here"
+        print state_dict
+        print state_dict["state_dict"]
         new_state_dict = OrderedDict()
         for k, v in state_dict.items():
             name = k[7:]  # remove `module.`
