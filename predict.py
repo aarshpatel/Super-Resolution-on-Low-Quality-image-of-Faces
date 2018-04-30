@@ -43,7 +43,7 @@ if __name__ == "__main__":
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
         model = baseline_cnn_model.BaselineCNNModel()
-        model.load_state_dict(torch.load("saved_models/" + str(model_name) + "model_best.pth.tar"))
+        model.load_state_dict(torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")['state_dict'])
         model.cuda()
         output = model(blurred)
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
