@@ -30,12 +30,8 @@ class ResnetSubPixelCNN(nn.Module):
 
     def forward(self, x):
         block0 = self.block0(x)
-        block1 = self.block1(block0)
-        block2 = self.block2(block1)
-        block3 = self.block3(block2)
-        block4 = self.block4(block3)
-        block5 = self.block5(block4)
-        block6 = self.block6(block5)
+        res_blocks_output = self.residual_blocks(block0)
+        block6 = self.block6(res_blocks_output)
         block7 = self.upsample(block0 + block6) 
         out = self.out(block7)
         return out
