@@ -262,13 +262,13 @@ def save_image(input, output, target, filename):
     vutils.save_image(all_images, filename=filename, normalize=True)
 
 
-def save_checkpoint(name, state, is_best, filename='checkpoint.pth.tar'):
+def save_checkpoint(name, epoch, model, is_best, filename='checkpoint.pth.tar'):
     """Saves model checkpoint to disk"""
     directory = "saved_models/%s/" % (name)
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename = directory + filename
-    torch.save(state, filename)
+    torch.save(model, filename)
     if is_best:
         shutil.copyfile(filename, 'saved_models/%s/' % (name) + 'model_best.pth.tar')
 
