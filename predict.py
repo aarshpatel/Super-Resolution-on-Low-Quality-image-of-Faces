@@ -49,8 +49,6 @@ if __name__ == "__main__":
         ])
         # normalize train_mean and train_std
         blurred = np.array(blurred)
-        # blurred = blurred.astype(float)
-        # blurred = torch.from_numpy(blurred).type(torch.FloatTensor) 
         blurred = Variable(transform_normalize(blurred)) 
         blurred = blurred.unsqueeze(0)
 
@@ -59,9 +57,7 @@ if __name__ == "__main__":
 
         print "Blurred Output Model: ", output.size() 
 
-        # vutils.save_image(, filename="saved_models/" + filename, normalize=True)
-        # blurred = .cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
-        # input = blurred.data.squeeze().transpose(2,1).transpose(2,0)
+        vutils.save_image(output.data.float(), filename="saved_models/" + str(model_name) + "prediction.jpg", normalize=True)
         # save_image(input=input, output=output, target=target, filename=str(model_name) + "Prediction.jpg")
     else:
-        print("=> no checkpoint found at '{}'".format("saved_models/" + str(model_name) + "best_model.pth.tar"))
+        print("=> no checkpoint found at '{}'".format("saved_models/" + )
