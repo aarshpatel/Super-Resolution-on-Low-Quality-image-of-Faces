@@ -35,7 +35,7 @@ if __name__ == "__main__":
         print("=> loading checkpoint '{}'".format(model_name))
         model = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
         model.cuda()
-
+        model.eval()
 
         # convert to cuda
         train_mean = np.array([149.59638197, 114.21029544, 93.41318133])
@@ -52,8 +52,14 @@ if __name__ == "__main__":
         blurred = blurred.astype(float)
         blurred = torch.from_numpy(blurred).type(torch.FloatTensor) 
         blurred = Variable(normalize(blurred)) 
-        blurred.cuda()
-        print "Blurred Input: ", blurred.size() 
+        blurred = blurred.unsqueeze(0)
+
+        print "Blurred Input to model: ", blurred.size()
+        output = model(blurred.cuda())
+
+        print "Blurred Output Model: ", output.size() 
+
+        # vutils.save_image(, filename="saved_models/" + filename, normalize=True)
         # blurred = .cuda().unsqueeze_(0).transpose(3,1).transpose(3,2)
         # input = blurred.data.squeeze().transpose(2,1).transpose(2,0)
         # save_image(input=input, output=output, target=target, filename=str(model_name) + "Prediction.jpg")
