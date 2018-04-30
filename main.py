@@ -286,9 +286,12 @@ if __name__ == "__main__":
 	if opt.model == "BaselineCNNModel": 
 		model = BaselineCNNModel(num_convblocks=num_convblocks)
 		print "The number of ConvBlocks to use in the BaselineCNNModel: ", num_convblocks
+		main_hyperparameters += "_convblocks={}".format(num_convblocks)
 	elif opt.model == "ResnetSubPixelCNN":
 		model = ResnetSubPixelCNN(num_resnet_blocks=resnet_blocks)
 		print "The number of Resnet blocks to use in the ResnetSubPixelCNN model: ", resnet_blocks
+		main_hyperparameters += "_resnetblocks={}".format(resnet_blocks)
+
 	# set the optimizer
 	optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
 
