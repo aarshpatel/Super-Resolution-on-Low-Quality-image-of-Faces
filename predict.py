@@ -9,60 +9,35 @@ import torch.nn as nn
 from torch.autograd import Variable
 from scripts.metrics import calc_psnr, calc_ssim
 from scripts.average_meter import AverageMeter
-from models.three_layer_cnn_baseline import ThreeLayerCNNBaseline
+import os
+import torchvision.utils as vutils
+
+
+
+def save_image(input, output, target, filename):
+    """ Save the input, output, target image during training """
+    all_images = torch.cat((input, output, target))
+    vutils.save_image(all_images, filename=filename, normalize=True)
 
 
 if __name__ == "__main__":
-	parser = argparse.ArgumentParser(description='Prediction script to test performance of the model on the testing data')
-	parser.add_argument("--model", type=str, help="the trained model to evaluate")
-	parser.add_argument('--grayscale', action="store_true", help="use grayscale images?")
-	parser.add_argument('--batch_size', type=int, default=64, help='training batch size')
-	parser.add_argument('--threads', type=int, default=4, help='number of threads for data loader to use')
-	parser.add_argument('--cuda', action='store_true', help='use cuda?')
-		
-	opt = parser.parse_args()
-	model_name = opt.model
+    parser = argparse.ArgumentParser(
+        description='Prediction script to test performance of the model on the testing data')
+    parser.add_argument("--model", type=str, help="the trained model to evaluate")
+    parser.add_argument("--image", type=str, help="the image passed into the model")
+    parser.add_argument('--cuda', action='store_true', help='use cuda?')
 
-	grayscale = opt.grayscale
-	batch_size = opt.batch_size
-	metrics = opt.metrics
-	num_workers = opt.threads
-	use_cuda = opt.cuda
-	
-	model_name_split_parameters = model_name.split("/")[2].split("_")
-	method = model_name_split_parameters[1].split("=")[1]
-	size = int(model_name_split_parameters[2].split("=")[1])
-	model = model_name_split_parameters[0]
+    opt = parser.parse_args()
+    model_name = opt.model
+    use_cuda = opt.cuda
+    test_image = opt.image
 
-	if grayscale:
-		image_color = "grayscale"
-	else:
-		image_color = "rgb"	
-
-	train_mean = np.array([149.59638197, 114.21029544,  93.41318133])
-	train_std = np.array([52.54902009, 44.34252746, 42.88273568])
-	normalize = transforms.Normalize(mean=[mean/255.0 for mean in train_mean],
-										std=[std/255.0 for std in train_std])
-	transform_normalize = transforms.Compose([
-		transforms.ToTensor(),
-		normalize,
-	])
-
-	# get the testing data
-	test_dset = ObfuscatedDatasetLoader("./data/lfw_preprocessed/cropped_{}/".format(image_color), method, size,
-											grayscale=False, data_type="test", transform=transform_normalize)
-	test_loader = DataLoader(test_dset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-
-	if model == "ThreeLayerCNNBaseline":
-		print("Loading model: ", model)
-		model = ThreeLayerCNNBaseline()
-	else:
-		print("Loading some other model")	
-
-
-	trained_model_params = torch.load(model_name)
-
-	# load in the model weights
-	model.load_state_dict(trained_model_params['state_dict'])
-
-	model.cuda()
+    if os.path.isfile("/saved_models/" + str(model_name) + "/best_model.pth.tar"):
+        print("=> loading checkpoint '{}'".format(model_name))
+        test_model = torch.load("/saved_models/" + str(model_name) + "/best_model.pth.tar")
+        test_model.cuda()
+        test_model.eval()
+        output = test_model(test_image)
+        save_image(input=test_image, output=output, target=model_name, filename="sample_prediction_" + str(model_name) + "__" + str(test_image))
+    else:
+        print("=> no checkpoint found at '{}'".format("/saved_models/" + str(model_name) + "/best_model.pth.tar"))
