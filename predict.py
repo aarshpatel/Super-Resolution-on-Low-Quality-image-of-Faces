@@ -12,7 +12,7 @@ from scripts.average_meter import AverageMeter
 import os
 import torchvision.utils as vutils
 from PIL import Image, ImageFilter
-
+from models import resnet_subpixel_cnn
 def save_image(input, output, target, filename):
     """ Save the input, output, target image during training """
     all_images = torch.cat((input, output, target))
@@ -38,12 +38,14 @@ if __name__ == "__main__":
     blurred = apply_gaussian_blur(clean, radius=4)
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
-        test_model = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
-        test_model.cuda()
-        test_model.eval()
-        output = test_model(blurred)
-        save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction__" + str(output))
-        save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Ground_truth__" + str(test_image))
-        save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Blurred__" + str(blurred))
+        checkpoint = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
+        best_prec1 = checkpoint['best_prec1']
+        model = resnet_subpixel_cnn.ResnetSubPixelCNN()
+        model.load_state_dict(checkpoint['state_dict'])
+        model.cuda()
+        output = model(blurred)
+        save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
+        save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Ground_truth.jpg")
+        save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Blurred.jpg")
     else:
         print("=> no checkpoint found at '{}'".format("saved_models/" + str(model_name) + "best_model.pth.tar"))
