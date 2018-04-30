@@ -9,11 +9,11 @@ import torch.nn as nn
 from torch.autograd import Variable
 from scripts.metrics import calc_psnr, calc_ssim
 from scripts.average_meter import AverageMeter
-from torch.utils.serialization import load_lua
 import os
 import torchvision.utils as vutils
 from PIL import Image, ImageFilter
 from models import resnet_subpixel_cnn
+from models import baseline_cnn_model
 from collections import OrderedDict
 
 
@@ -43,13 +43,8 @@ if __name__ == "__main__":
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
         state_dict = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
-        model = resnet_subpixel_cnn.ResnetSubPixelCNN(num_resnet_blocks=5)
-        new_state_dict = OrderedDict()
-        for k, v in state_dict.items():
-            name = k[7:]  # remove `module.`
-            new_state_dict[name] = v
-        # load params
-        model.load_state_dict(new_state_dict)
+        model = baseline_cnn_model.BaselineCNNModel
+        model.load_state_dict(state_dict)
         model.cuda()
         output = model(blurred)
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
