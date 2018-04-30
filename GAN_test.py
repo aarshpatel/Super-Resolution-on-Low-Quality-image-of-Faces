@@ -448,7 +448,7 @@ if __name__ == "__main__":
 
             # measure psnr and loss
             mse = loss_fn(fake_images, target)
-            psnr = 10 * log10(1 / mse.data[0])
+            psnr = 10 * log10(255 / mse.data[0])
             psnr_meter.update(psnr, input.size(0))
             losses_meter.update(lossG.data[0], input.size(0))
 
