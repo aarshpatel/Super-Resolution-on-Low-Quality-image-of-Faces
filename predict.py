@@ -51,7 +51,7 @@ if __name__ == "__main__":
         blurred = np.array(blurred)
         blurred = blurred.astype(float)
         blurred = torch.from_numpy(blurred).type(torch.FloatTensor) 
-        blurred = Variable(normalize(blurred)) 
+        blurred = Variable(transform_normalize(blurred)) 
         blurred = blurred.unsqueeze(0)
 
         print "Blurred Input to model: ", blurred.size()
