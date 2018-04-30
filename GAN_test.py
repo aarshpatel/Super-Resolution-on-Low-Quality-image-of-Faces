@@ -64,9 +64,6 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
 
         # Update Gradients for Discriminator
         lossD = d_loss_real + d_loss_fake
-        modelD.zero_grad()
-        lossD.backward()
-        optimizerD.step()
         # ==================================================================
         # TRAINING THE GENERATIVE MODEL
         # ==================================================================
@@ -77,16 +74,16 @@ def train(train_loader, modelG, modelD, loss_type, optimizerG, optimizerD, epoch
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
             lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
-            lossD = loss_fn2(outputs2, fake_labels)
+            lossD += loss_fn2(outputs2, fake_labels)
 
         elif loss_type == "both":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
             lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1)) + (loss_fn(fake_images, target) *.5)
-            lossD = loss_fn2(outputs2, fake_labels)
+            lossD += loss_fn2(outputs2, fake_labels)
         else:
             lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
-            lossD = loss_fn2(outputs2, fake_labels)
+            lossD += loss_fn2(outputs2, fake_labels)
 
         # Backprop + Optimize
         modelD.zero_grad()
@@ -186,16 +183,16 @@ def validate(val_loader, modelG, modelD, loss_type, epoch, vgg_loss, model_name)
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
             lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
-            lossD = loss_fn2(outputs2, fake_labels)
+            lossD += loss_fn2(outputs2, fake_labels)
 
         elif loss_type == "both":
             vgg_loss_output = vgg_loss(fake_images)
             vgg_loss_target = vgg_loss(target)
             lossG = (loss_fn(vgg_loss_output, vgg_loss_target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1)) + (loss_fn(fake_images, target) *.5)
-            lossD = loss_fn2(outputs2, fake_labels)
+            lossD += loss_fn2(outputs2, fake_labels)
         else:
             lossG = (loss_fn(fake_images,target)) + (loss_fn2(outputs2, real_labels) * .01*(epoch+1))
-            lossD = loss_fn2(outputs2, fake_labels)
+            lossD += loss_fn2(outputs2, fake_labels)
         # ==================================================================
         # UPDATING STATISTICS
         # ==================================================================
