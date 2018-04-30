@@ -4,6 +4,9 @@ import argparse
 import os
 import torchvision.utils as vutils
 from PIL import Image, ImageFilter
+import numpy as np
+import torchvision.transforms as transforms
+from torch.autograd import Variable
 
 
 def save_image(input, output, target, filename):
@@ -33,6 +36,30 @@ if __name__ == "__main__":
         print("=> loading checkpoint '{}'".format(model_name))
         model = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
         model.cuda()
+
+        # convert to pytorch tensor
+
+        # convert variable
+
+        # convert to cuda
+        train_mean = np.array([149.59638197, 114.21029544, 93.41318133])
+        train_std = np.array([52.54902009, 44.34252746, 42.88273568])
+        normalize = transforms.Normalize(mean=[mean / 255.0 for mean in train_mean],
+                                         std=[std / 255.0 for std in train_std])
+
+        transform_normalize = transforms.Compose([
+            transforms.ToTensor(),
+            normalize,
+        ])
+        # normalize train_mean and train_std
+        blurred = np.array(blurred)
+        blurred = blurred.astype(float)
+        blurred = Variable(torch.from_numpy(blurred)).cuda()
+        blurred = normalize(blurred)
+        test_image = np.array(test_image)
+        test_image = test_image.astype(float)
+        test_image = Variable(torch.from_numpy(test_image)).cuda()
+        test_image = normalize(test_image)
         output = model(blurred)
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Ground_truth.jpg")
