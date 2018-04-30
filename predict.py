@@ -39,7 +39,9 @@ if __name__ == "__main__":
     blurred = apply_gaussian_blur(clean, radius=4)
     if os.path.isfile("saved_models/" + str(model_name) + "model_best.pth.tar"):
         print("=> loading checkpoint '{}'".format(model_name))
-        model = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
+        checkpoint = torch.load("saved_models/" + str(model_name) + "model_best.pth.tar")
+        model = resnet_subpixel_cnn.ResnetSubPixelCNN(num_resnet_blocks=5)
+        model.load_state_dict(checkpoint)
         model.cuda()
         output = model(blurred)
         save_image(input=blurred, output=output, target=model_name, filename=str(model_name) + "_Prediction.jpg")
