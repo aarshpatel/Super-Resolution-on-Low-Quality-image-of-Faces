@@ -56,7 +56,7 @@ if __name__ == "__main__":
         blurred = blurred.astype(float)
         blurred = torch.from_numpy(blurred)
         blurred = Variable(normalize(blurred)).cuda()
-        test_image = np.array(test_image)
+        test_image = np.array(clean)
         test_image = test_image.astype(float)
         test_image = torch.from_numpy(test_image)
         test_image = Variable(normalize(test_image)).cuda()
