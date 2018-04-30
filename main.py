@@ -52,8 +52,14 @@ def train(train_loader, model, loss_type, optimizer, epoch, model_name, vgg_loss
 			vgg_loss_output = vgg_loss(output)
 			vgg_loss_target = vgg_loss(target)
 			loss = loss_fn(vgg_loss_output, vgg_loss_target)
-		else:
+		elif loss_type == "pixel":
 			loss = loss_fn(output, target)
+		elif loss_type == "pixel_perceptual":
+			vgg_loss_output = vgg_loss(output)
+			vgg_loss_target = vgg_loss(target)
+			perceptual_loss = loss_fn(vgg_loss_output, vgg_loss_target)
+			pixel_loss = loss_fn(output, target)
+			loss = (.5) * pixel_loss + perceptual_loss
 
 		# measure psnr and loss
 		mse = loss_fn(output, target)
