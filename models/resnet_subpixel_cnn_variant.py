@@ -9,20 +9,20 @@ class ResnetSubPixelCNNVariant(nn.Module):
         super(ResnetSubPixelCNNVariant,self).__init__()
         #Before First residual Block
         self.block0 = nn.Sequential(
-            nn.Conv2d(3, 128, kernel_size=4, stride=2, padding=1),
+            nn.Conv2d(3, 64, kernel_size=4, stride=2, padding=1),
             nn.PReLU()
         )
-        self.block1 = ResidualBlock(128)
-        self.block2 = ResidualBlock(128)
-        self.block3 = ResidualBlock(128)
-        self.block4 = ResidualBlock(128)
-        self.block5 = ResidualBlock(128)
+        self.block1 = ResidualBlock(64)
+        self.block2 = ResidualBlock(64)
+        self.block3 = ResidualBlock(64)
+        self.block4 = ResidualBlock(64)
+        self.block5 = ResidualBlock(64)
         self.block6 = nn.Sequential(
-            nn.Conv2d(128, 128, kernel_size=9, stride=1, padding=4),
-            nn.BatchNorm2d(128)
+            nn.Conv2d(64, 64, kernel_size=9, stride=1, padding=4),
+            nn.BatchNorm2d(64)
         )
         self.upsample = nn.Sequential(
-            nn.Conv2d(128, 12, kernel_size=9, stride=1, padding=4),
+            nn.Conv2d(64, 12, kernel_size=9, stride=1, padding=4),
             nn.PixelShuffle(2),
             nn.PReLU()
         )
