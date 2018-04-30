@@ -215,6 +215,7 @@ if __name__ == "__main__":
 	parser.add_argument('--save_img', action="store_true", help="save the output images when training the model")
 	parser.add_argument('--num_convblocks', type=int, default=1, help="the number of convblocks to use in the BaselineCNNModel")
 	parser.add_argument('--resnet_blocks', type=int, default=5, help="the number of resnet blocks to use the ResnetSubpixelCNN model")
+	parser.add_argument('--save_val_psnr', action="store_true", help="store the val_psnr during training in a file?")
 
 	global opt, writer, best_avg_psnr
 	opt = parser.parse_args()
@@ -237,6 +238,7 @@ if __name__ == "__main__":
 	grayscale = opt.grayscale
 	num_convblocks = opt.num_convblocks
 	resnet_blocks = opt.resnet_blocks
+	save_val_psnr = opt.save_val_psnr
 
 	main_hyperparameters = "{0}_method={1}_size={2}_loss={3}_lr={4}_epochs={5}_batch_size={6}".format(opt.model,
 																									opt.method,
